@@ -1,0 +1,61 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="danimaster.master.cs" Inherits="danimaster" %>
+
+<!DOCTYPE html>
+<html lang="he">
+<head runat="server">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>האתר שלי</title>
+    
+    <!-- External Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Trocchi&display=swap" rel="stylesheet">
+    
+    <!-- External CSS -->
+    <link href="StyleSheet.css" rel="stylesheet" />
+    
+    <!-- Placeholder for additional head content -->
+    <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
+</head>
+
+<body id="Body" runat="server" style="direction: rtl; text-align: right;">
+    <form id="form1" runat="server">
+        <!-- Header with Logo -->
+        <header id="headerMenu">
+            <img src="pics/sigma.png" alt="לוגו האתר" class="logo"/>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="content-container">
+            <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server"></asp:ContentPlaceHolder>
+        </main>
+
+        <!-- Navigation Bar (Non-Fixed) -->
+        <nav class="nav-bar">
+            <a href="home.aspx">בית</a>
+            <a href="register.aspx">הרשמה</a>
+            <a href="tasks.aspx">טופס משימות</a>
+            <a href="contactus.aspx">צור קשר</a>
+            <a href="contant.aspx">תוכן</a>
+            <a href="login.aspx">כניסה</a>
+            <a href="termofservice.aspx">תנאי שירות</a>
+            <a href="cusers.aspx">משתמשים</a>
+        </nav>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 האתר שלי. כל הזכויות שמורות.</p>
+        </footer>
+        
+        <!-- Scroll-to-top button -->
+<button id="scrollToTopBtn" onclick="scrollToTop()" style="position: fixed; bottom: 20px; right: 20px; padding: 5px 10px; background-color: #333; color: white; border: none; border-radius: 50%; cursor: pointer; display: none; font-size: 18px; width: 40px; height: 40px; text-align: center; line-height: 30px;">
+    ↑
+</button>
+
+    </form>
+
+    <!-- Include JavaScript -->
+    <script src="JavaScript.js" defer></script>
+</body>
+</html>
