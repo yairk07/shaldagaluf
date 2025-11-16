@@ -53,15 +53,25 @@
            <tr>
     <td><label for="ddlOptions">בחר עיר</label></td>
     <td>
-        <asp:DropDownList ID="ddlOptions" runat="server" CssClass="inputEvent">
-            <asp:ListItem Text="בחר עיר" Value="" />
-            <asp:ListItem Text="תל אביב" Value="1" />
-            <asp:ListItem Text="ירושלים" Value="2" />
-            <asp:ListItem Text="חיפה" Value="3" />
-            <asp:ListItem Text="באר שבע" Value="4" />
-            <asp:ListItem Text="ראשון לציון" Value="5" />
-            <asp:ListItem Text="נתניה" Value="6" />
-        </asp:DropDownList>
+     <asp:DropDownList ID="ddlOptions" runat="server" CssClass="inputEvent">
+    <asp:ListItem Text="בחר עיר" Value="" />
+    <asp:ListItem Text="אילת" Value="1" />
+    <asp:ListItem Text="בני ברק" Value="2" />
+    <asp:ListItem Text="דימונה" Value="4" />
+    <asp:ListItem Text="הרצליה" Value="5" />
+    <asp:ListItem Text="ורד הגליל" Value="6" />
+    <asp:ListItem Text="זכרון יעקב" Value="7" />
+    <asp:ListItem Text="חדרה" Value="8" />
+    <asp:ListItem Text="טבריה" Value="9" />
+    <asp:ListItem Text="ירושלים" Value="10" />
+    <asp:ListItem Text="כפר סבא" Value="11" />
+    <asp:ListItem Text="לוד" Value="12" />
+    <asp:ListItem Text="מעלה עפריים" Value="13" />
+    <asp:ListItem Text="נתניה" Value="14" />
+    <asp:ListItem Text="ראשון לציון" Value="20" />
+    <asp:ListItem Text="תל אביב" Value="21" />
+</asp:DropDownList>
+
     </td>
 </tr>
 

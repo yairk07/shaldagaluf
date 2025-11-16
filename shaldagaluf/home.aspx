@@ -24,7 +24,7 @@
             <h3>האירועים שלך:</h3>
             <asp:Label ID="lblEvents" runat="server" CssClass="events-list" />
         </div>
-
+       
         <!-- Quote -->
         <div class="quote-section">
             <p class="quote">

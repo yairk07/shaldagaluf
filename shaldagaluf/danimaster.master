@@ -40,7 +40,10 @@
             <a href="contant.aspx">תוכן</a>
             <a href="login.aspx">כניסה</a>
             <a href="termofservice.aspx">תנאי שירות</a>
-            <a href="cusers.aspx">משתמשים</a>
+            <a href="exusers.aspx">משתמשים</a>
+             <asp:LinkButton ID="lnkUserName" runat="server" CssClass="logout-btn" 
+    OnClick="lnkUserName_Click">התנתק</asp:LinkButton>
+
         </nav>
 
         <!-- Footer -->

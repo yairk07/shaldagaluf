@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Data;
+using System.Data.OleDb;
 using System.Web.UI;
 
 public partial class register : System.Web.UI.Page
@@ -6,6 +8,29 @@ public partial class register : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
         lblMessage.Text = "";
+
+        if (!IsPostBack)
+        {
+            BindCities();   // טוען ערים מהטבלה Citys
+        }
+    }
+
+    private void BindCities()
+    {
+        using (var con = new OleDbConnection(Connect.GetConnectionString()))
+        using (var cmd = new OleDbCommand("SELECT id, cityname FROM Citys WHERE id Is Not Null ORDER BY cityname", con))
+        using (var da = new OleDbDataAdapter(cmd))
+        {
+            var dt = new DataTable();
+            con.Open();
+            da.Fill(dt);
+
+            // שומר את פריט "בחר עיר" שכבר נמצא ב-ASPX
+            ddlOptions.DataSource = dt;
+            ddlOptions.DataTextField = "cityname";
+            ddlOptions.DataValueField = "id";
+            ddlOptions.DataBind();
+        }
     }
 
     protected void btnRegister_Click(object sender, EventArgs e)
@@ -22,15 +47,15 @@ public partial class register : System.Web.UI.Page
         string cityStr = ddlOptions.SelectedValue;
         string yearofbirth = txtYearOfBirth.Text;
 
-        // לא שדה בטופס: נדרש להוסיף ב־.aspx
-
+        // בדיקות בסיס
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(firstName) ||
             string.IsNullOrEmpty(lastName) || string.IsNullOrEmpty(email) ||
             string.IsNullOrEmpty(password) || string.IsNullOrEmpty(confirmPassword) ||
             string.IsNullOrEmpty(phone) || string.IsNullOrEmpty(id) ||
-            string.IsNullOrEmpty(genderStr)  || string.IsNullOrEmpty(yearofbirth))
+            string.IsNullOrEmpty(genderStr) || string.IsNullOrEmpty(yearofbirth) ||
+            string.IsNullOrEmpty(cityStr))
         {
-            lblMessage.Text = "אנא מלא את כל השדות.";
+            lblMessage.Text = "אנא מלא את כל השדות ובחר עיר.";
             lblMessage.ForeColor = System.Drawing.Color.Red;
             return;
         }
@@ -49,16 +74,17 @@ public partial class register : System.Web.UI.Page
             return;
         }
 
-        int gender, city, yearOfBirth;
-        if (!int.TryParse(genderStr, out gender) ||
-            !int.TryParse(cityStr, out city) ||
-            !int.TryParse(yearofbirth, out yearOfBirth))
+        // המרות מספריות מאובטחות
+        if (!int.TryParse(genderStr, out int gender) ||
+            !int.TryParse(cityStr, out int city) ||
+            !int.TryParse(yearofbirth, out int yearOfBirth))
         {
-            lblMessage.Text = "וודא שציינת מספרים תקינים עבור מין, עיר ושנת לידה.";
+            lblMessage.Text = "וודא שמין, עיר ושנת לידה הם מספרים תקינים.";
             lblMessage.ForeColor = System.Drawing.Color.Red;
             return;
         }
 
+        // יצירת משתמש ושמירה
         User user = new User
         {
             Username = username,
@@ -70,7 +96,7 @@ public partial class register : System.Web.UI.Page
             YearOfBirth = yearOfBirth,
             UserId = id,
             PhoneNum = phone,
-            City = city
+            City = city              // <-- תמיד ה-id מטבלת Citys
         };
 
         user.insertintodb();

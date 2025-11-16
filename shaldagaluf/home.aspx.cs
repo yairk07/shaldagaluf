@@ -36,7 +36,7 @@ public partial class home : System.Web.UI.Page
             allEvents = (DataSet)ViewState["AllEvents"];
         }
     }
-
+    
     protected void calendar_SelectionChanged(object sender, EventArgs e)
     {
         DateTime selectedDate = calendar.SelectedDate;

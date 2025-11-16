@@ -12,9 +12,14 @@ public partial class danimaster : System.Web.UI.MasterPage
         if (!IsPostBack)
         {
             string pageName = System.IO.Path.GetFileNameWithoutExtension(Request.Url.AbsolutePath);
-            Body.Attributes["class"] = "page-" + pageName.ToLower(); // למשל: page-register
+            Body.Attributes["class"] = "page-" + pageName.ToLower();
         }
     }
 
-
+    protected void lnkUserName_Click(object sender, EventArgs e)
+    {
+        // Log out the user
+        Session["username"] = null;
+        Response.Redirect("login.aspx"); // עדיף לנתב לדף ההתחברות ולא ל-home
+    }
 }
