@@ -6,7 +6,7 @@ using System.Web;
 /// </summary>
 public class Connect
 {
-    private const string calnder = "calnder.db1.accdb";
+    private const string calnder = "calnder.db1.accdb.mdb";
 
     public static string GetConnectionString()
     {

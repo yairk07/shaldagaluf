@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
+using System.Web.UI.WebControls;
 
 public partial class exusers : System.Web.UI.Page
 {
@@ -52,6 +53,7 @@ public partial class exusers : System.Web.UI.Page
     {
         BindUsers(txtSearchemail.Text);
     }
+
     // מחזיר את שם העיר לפי העמודה שקיימת בפועל בדאטהסט
     protected string GetCity(object dataItem)
     {
@@ -71,5 +73,4 @@ public partial class exusers : System.Web.UI.Page
         }
         return string.Empty;
     }
-
 }

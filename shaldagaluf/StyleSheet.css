@@ -511,3 +511,560 @@ body.page-cusers {
     .logout-btn:hover {
         color: #ff5050;
     }
+/* קישור רגיל ולא נלחץ */
+a:link {
+    color: black;
+    text-decoration: none;
+}
+
+/* קישור שכבר נלחץ */
+a:visited {
+    color: black;
+    text-decoration: none;
+}
+
+/* הובר יפה ועדין */
+a:hover {
+    color: #444;
+    text-decoration: underline;
+}
+
+/* בזמן לחיצה */
+a:active {
+    color: #222;
+}
+/* ========== RESET & BASE ========== */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #f0f2f5;
+    --text: #333;
+    --heading: #2c3e50;
+    --muted: #555;
+    --border: #ccc;
+    --brand: #3498db;
+    --brand-dark: #2980b9;
+    --success: #27ae60;
+    --success-dark: #219150;
+    --nav: #444;
+    --shadow-sm: 0 4px 10px rgba(0,0,0,.05);
+    --shadow-md: 0 6px 20px rgba(0,0,0,.10);
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    direction: rtl;
+}
+
+/* ========== TYPOGRAPHY ========== */
+h2, h3 {
+    text-align: center;
+    color: var(--heading);
+    margin-bottom: 20px;
+}
+
+/* ========== NAVIGATION ========== */
+.nav-bar {
+    background-color: var(--nav);
+    padding: 10px 0;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 75%;
+    z-index: 1000;
+}
+
+    .nav-bar a {
+        color: #fff;
+        text-decoration: none;
+        padding: 10px 20px;
+        font-size: 18px;
+        display: inline-block;
+        transition: background-color .3s;
+    }
+
+        .nav-bar a:hover {
+            background-color: #666;
+            border-radius: 5px;
+        }
+
+/* ========== FORM ELEMENTS ========== */
+input[type="text"],
+textarea,
+.inputEvent {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 15px;
+    transition: border-color .3s;
+}
+
+    input:focus,
+    textarea:focus,
+    .inputEvent:focus {
+        border-color: var(--brand);
+        outline: none;
+    }
+
+/* ========== BUTTONS (בסיס + וריאציות) ========== */
+button,
+.addEventBtn {
+    background-color: var(--brand);
+    color: #fff;
+    border: 0;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background-color .3s ease, transform .05s ease;
+    display: block;
+    margin: 10px auto;
+    text-align: center;
+}
+
+    button:hover,
+    .addEventBtn:hover {
+        background-color: var(--brand-dark);
+    }
+
+    button:active,
+    .addEventBtn:active {
+        transform: translateY(1px);
+    }
+
+/* כפתור ירוק קיים */
+.addEventBtn {
+    background-color: var(--success);
+}
+
+    .addEventBtn:hover {
+        background-color: var(--success-dark);
+    }
+
+/* ========== PANELS (כללי) ========== */
+.about-section {
+    background: #fff;
+    margin: 20px auto;
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    max-width: 900px;
+}
+
+.welcome-label {
+    font-size: 20px;
+    color: var(--heading);
+    display: block;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* ========== QUOTE ========== */
+.quote-section {
+    margin: 40px 0;
+    text-align: center;
+}
+
+.quote {
+    font-style: italic;
+    font-size: 17px;
+    color: var(--muted);
+    padding: 15px;
+    background-color: #eef2f5;
+    border-radius: var(--radius-md);
+}
+
+/* ========== GALLERY ========== */
+.gallery {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.gallery-img {
+    max-width: 90%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    transition: transform .3s ease;
+}
+
+    .gallery-img:hover {
+        transform: scale(1.02);
+    }
+
+#prevBtn, #nextBtn {
+    background: transparent;
+    border: 0;
+    font-size: 30px;
+    cursor: pointer;
+    color: var(--text);
+    transition: color .3s ease;
+}
+
+    #prevBtn:hover, #nextBtn:hover {
+        color: var(--brand);
+    }
+
+/* ========== RUSSIAN ROULETTE GAME ========== */
+.roulette-game {
+    margin: 40px 0;
+    text-align: center;
+}
+
+.word-input {
+    padding: 10px;
+    width: 250px;
+    max-width: 90%;
+    margin: 10px;
+    font-size: 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+
+.roulette-btn {
+    background-color: #c0392b;
+    color: #fff;
+    border: 0;
+    padding: 10px 30px;
+    font-size: 18px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background-color .3s ease;
+}
+
+    .roulette-btn:hover {
+        background-color: #a93226;
+    }
+
+.roulette-result {
+    font-size: 20px;
+    margin-top: 20px;
+    color: var(--heading);
+}
+
+/* Loss section */
+.loss-section {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.loss-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.loss-gif {
+    max-width: 300px;
+    width: 100%;
+    border-radius: var(--radius-lg);
+}
+
+.loser-name-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 24px;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 0 0 10px #000;
+}
+
+/* Decorative GIF */
+.roulette-animation {
+    margin-top: 50px;
+    text-align: center;
+}
+
+.roulette-gif {
+    max-width: 300px;
+    width: 100%;
+    border-radius: var(--radius-md);
+}
+
+/* ========== PAGE: register.aspx ========== */
+body.page-register {
+    padding-top: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background-color: #eef2f5;
+    min-height: 100vh;
+}
+
+#mainform {
+    background: #fff;
+    padding: 40px 50px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    max-width: 700px;
+    width: 100%;
+}
+
+    #mainform h1 {
+        text-align: center;
+        color: var(--heading);
+        margin-bottom: 30px;
+        font-size: 28px;
+    }
+
+    #mainform table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 15px 12px;
+    }
+
+    #mainform label {
+        font-weight: bold;
+        color: #34495e;
+    }
+
+    #mainform select {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        transition: border-color .3s;
+    }
+
+.radioButtonList {
+    display: flex;
+    gap: 20px;
+    direction: rtl;
+    padding-top: 5px;
+}
+
+#lblMessage {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    font-weight: bold;
+    color: red;
+}
+
+/* ========== PAGE: contactus.aspx ========== */
+.contactus-section {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 40px;
+    background: #fff;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+    .contactus-section h1 {
+        text-align: center;
+        color: #1a3d7c;
+        margin-bottom: 30px;
+    }
+
+    .contactus-section label,
+    .contactus-section div {
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #34495e;
+    }
+
+    .contactus-section input,
+    .contactus-section textarea,
+    .contactus-section select {
+        width: 100%;
+        padding: 14px;
+        font-size: 16px;
+        border: 1px solid #bbb;
+        border-radius: var(--radius-md);
+        margin-bottom: 20px;
+        box-sizing: border-box;
+        transition: border-color .3s ease;
+    }
+
+        .contactus-section input:focus,
+        .contactus-section textarea:focus,
+        .contactus-section select:focus {
+            border-color: #1a3d7c;
+            box-shadow: 0 0 6px #1a3d7caa;
+            outline: none;
+        }
+
+/* ========== PAGE TOP PADDING HELPERS ========== */
+body.page-termofservice,
+body.page-cusers {
+    padding-top: 100px;
+}
+
+/* ========== CALENDAR (כללי + tasks) ========== */
+.calendar-wrapper {
+    margin: 30px 0;
+}
+/* (מאוחדת) */
+
+.calendar {
+    /* כללית */
+    border: 1px solid var(--brand);
+    border-radius: 10px;
+    background: #fff;
+    padding: 15px;
+    box-shadow: var(--shadow-sm);
+    /* tasks overrides */
+    width: 100%;
+    height: auto;
+    font-size: 20px;
+    border: none;
+    border-radius: 16px;
+    padding: 0;
+    box-shadow: 0 8px 30px rgba(0,0,0,.08);
+}
+
+    .calendar table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 8px;
+        background: #dbeeff;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: inset 0 0 8px rgba(0,0,0,.05);
+    }
+
+    .calendar th,
+    .calendar td {
+        padding: 18px;
+        text-align: center;
+        border-radius: 12px;
+        background: #fff;
+        transition: background-color .3s, transform .2s;
+    }
+
+        .calendar td:hover {
+            background: #aed6f1;
+            cursor: pointer;
+            transform: scale(1.05);
+        }
+
+    .calendar .selected {
+        background: #1e88e5;
+        color: #fff;
+        font-weight: bold;
+        box-shadow: 0 0 10px #1e88e5aa;
+    }
+
+.selected-date {
+    display: block;
+    text-align: center;
+    font-size: 20px;
+    color: var(--heading);
+    margin: 10px 0 20px;
+}
+
+/* קלטי אירוע */
+.inputEvent {
+    width: 100%;
+    padding: 16px;
+    font-size: 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 20px;
+    transition: border-color .3s;
+}
+
+#btnAddEvent {
+    background-color: var(--success);
+    color: #fff;
+    padding: 16px 28px;
+    font-size: 20px;
+    border: 0;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    display: block;
+    margin: 20px auto;
+    transition: background-color .3s ease;
+}
+
+    #btnAddEvent:hover {
+        background-color: var(--success-dark);
+    }
+
+/* Events list (מאוחדת) */
+.events-list {
+    font-size: 18px;
+    color: var(--heading);
+    margin-top: 20px;
+    background: #fff;
+    padding: 24px;
+    border-radius: var(--radius-lg);
+    white-space: pre-line;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ========== MEDIA QUERIES ========== */
+@media (max-width:600px) {
+    #mainform {
+        padding: 25px;
+    }
+
+    .radioButtonList {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #mainform h1 {
+        font-size: 24px;
+    }
+}
+
+/* ========== MISC ========== */
+.logout-btn {
+    background: none;
+    border: none;
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 10px;
+}
+
+    .logout-btn:hover {
+        color: #ff5050;
+    }
+/* קישור רגיל ולא נלחץ */
+a:link {
+    color: black;
+    text-decoration: none;
+}
+
+/* קישור שכבר נלחץ */
+a:visited {
+    color: black;
+    text-decoration: none;
+}
+
+/* הובר יפה ועדין */
+a:hover {
+    color: #444;
+    text-decoration: underline;
+}
+
+/* בזמן לחיצה */
+a:active {
+    color: #222;
+}

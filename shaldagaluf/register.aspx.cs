@@ -69,7 +69,7 @@ public partial class register : System.Web.UI.Page
 
         if (!email.Contains("@") || !email.Contains("."))
         {
-            lblMessage.Text = "אנא הכנס כתובת אימייל תקינה.";
+            lblMessage.Text = "אנא הכנס כתובת אימייל תקינה";
             lblMessage.ForeColor = System.Drawing.Color.Red;
             return;
         }

@@ -32,17 +32,24 @@
         </main>
 
         <!-- Navigation Bar (Non-Fixed) -->
-        <nav class="nav-bar">
-            <a href="home.aspx">בית</a>
-            <a href="register.aspx">הרשמה</a>
-            <a href="tasks.aspx">טופס משימות</a>
-            <a href="contactus.aspx">צור קשר</a>
-            <a href="contant.aspx">תוכן</a>
-            <a href="login.aspx">כניסה</a>
-            <a href="termofservice.aspx">תנאי שירות</a>
-            <a href="exusers.aspx">משתמשים</a>
-             <asp:LinkButton ID="lnkUserName" runat="server" CssClass="logout-btn" 
-    OnClick="lnkUserName_Click">התנתק</asp:LinkButton>
+       <nav class="nav-bar">
+    <a href="home.aspx">בית</a>
+    <a href="register.aspx">הרשמה</a>
+    <a href="tasks.aspx">טופס משימות</a>
+    <a href="contactus.aspx">צור קשר</a>
+    <a href="contant.aspx">תוכן</a>
+    <a href="login.aspx">כניסה</a>
+    <a href="termofservice.aspx">תנאי שירות</a>
+
+    <!-- דפים לבעלים בלבד -->
+    <a href="exusers.aspx" id="linkUsers" runat="server">משתמשים</a>
+    <a href="allEvents.aspx" id="linkAllEvents" runat="server">כל האירועים</a>
+    <a href="editEvent.aspx" id="linkEditEvent" runat="server">עריכת אירוע</a>
+
+    <asp:LinkButton ID="lnkUserName" runat="server" CssClass="logout-btn"
+        OnClick="lnkUserName_Click">התנתק</asp:LinkButton>
+</nav>
+
 
         </nav>
 

@@ -19,12 +19,10 @@ public partial class home : System.Web.UI.Page
             }
             else
             {
-                // אם המשתמש לא מחובר – נחזיר לדף התחברות
                 Response.Redirect("login.aspx");
-                return; // חשוב – כדי לא להמשיך להריץ את שאר הקוד
+                return; 
             }
 
-            // טעינת אירועים
             allEvents = calendarService.GetAllEvents();
             ViewState["AllEvents"] = allEvents;
 
@@ -51,7 +49,13 @@ public partial class home : System.Web.UI.Page
 
         foreach (DataRow row in allEvents.Tables[0].Rows)
         {
-            DateTime eventDate = Convert.ToDateTime(row["date"]);
+            DateTime eventDate;
+
+            if (!DateTime.TryParse(row["date"].ToString(), out eventDate))
+            {
+                continue;
+            }
+
             if (eventDate.Date == date.Date)
             {
                 string title = row["title"].ToString();
@@ -85,10 +89,15 @@ public partial class home : System.Web.UI.Page
 
         foreach (DataRow row in allEvents.Tables[0].Rows)
         {
-            DateTime eventDate = Convert.ToDateTime(row["date"]);
+            DateTime eventDate;
+
+            if (!DateTime.TryParse(row["date"].ToString(), out eventDate))
+                continue;
+
             if (eventDate.Date == currentDay)
             {
                 string title = row["title"].ToString();
+
                 if (title.Length > 12)
                     title = title.Substring(0, 12) + "...";
 
@@ -99,5 +108,6 @@ public partial class home : System.Web.UI.Page
             }
         }
     }
+
 
 }

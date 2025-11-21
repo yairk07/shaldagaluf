@@ -1,0 +1,104 @@
+﻿using System;
+using System.Data;
+using System.Linq;
+
+public partial class exuserdetails : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        // אם אין סשן — שולח לכניסה
+        if (Session["username"] == null)
+        {
+            Response.Redirect("login.aspx");
+            return;
+        }
+
+        if (!IsPostBack)
+        {
+            // קורא את ה־ID מה־URL
+            string idStr = Request.QueryString["id"];
+
+            if (!int.TryParse(idStr, out int userId))
+            {
+                ShowNotFound();
+                return;
+            }
+
+            LoadUserById(userId);
+        }
+    }
+
+    private void LoadUserById(int userId)
+    {
+        var us = new UsersService();
+        var ds = us.getallusers();
+
+        if (ds == null || ds.Tables.Count == 0)
+        {
+            ShowNotFound();
+            return;
+        }
+
+        DataTable t = ds.Tables[0];
+
+        // 🎯 קריאה לפי ID בלבד
+        DataRow row = t.AsEnumerable()
+            .FirstOrDefault(r =>
+                int.TryParse(Convert.ToString(r["id"]), out int id) &&
+                id == userId
+            );
+
+        if (row == null)
+        {
+            ShowNotFound();
+            return;
+        }
+
+        pnlContent.Visible = true;
+        pnlNotFound.Visible = false;
+
+        lblUserName.Text = SafeGet(row, "userName");
+        lblFirstName.Text = SafeGet(row, "firstName");
+        lblLastName.Text = SafeGet(row, "lastName");
+        lblEmail.Text = SafeGet(row, "email");
+        lblPhone.Text = SafeGet(row, "phonenum");
+        lblCity.Text = GetCity(row);
+
+        // ⚡ מציג ROLE אמיתי מה־DB
+        lblAccessLevel.Text = SafeGet(row, "Role");
+    }
+
+    private void ShowNotFound()
+    {
+        pnlContent.Visible = false;
+        pnlNotFound.Visible = true;
+    }
+
+    private string SafeGet(DataRow row, string columnName)
+    {
+        if (row == null || row.Table == null) return string.Empty;
+
+        // מאתר עמודה גם אם אותיות לא תואמות
+        var col = row.Table.Columns
+            .Cast<DataColumn>()
+            .FirstOrDefault(c => c.ColumnName.Trim().ToLower() == columnName.ToLower());
+
+        if (col == null) return string.Empty;
+
+        object val = row[col.ColumnName];
+        return val == null || val == DBNull.Value ? string.Empty : Convert.ToString(val);
+    }
+
+    private string GetCity(DataRow row)
+    {
+        if (row == null || row.Table == null) return string.Empty;
+
+        string[] names = { "CityName", "cityname", "city" };
+
+        foreach (var n in names)
+            if (row.Table.Columns.Contains(n))
+                return SafeGet(row, n);
+
+        return string.Empty;
+    }
+}

@@ -1,45 +1,95 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/danimaster.master" AutoEventWireup="true" CodeFile="contant.aspx.cs" Inherits="Default3" %>
+﻿<%@ Page Title="תוכן" Language="C#" MasterPageFile="~/danimaster.master"
+    AutoEventWireup="true" CodeFile="contant.aspx.cs" Inherits="Default3" %>
 
-<asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
-    <!-- Link to the external JavaScript file -->
-    <script src="javaScript.js" type="text/javascript"></script>
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+
+    <link href="StyleSheet.css" rel="stylesheet" />
+
+    <style>
+        .contant-wrapper {
+            max-width: 900px;
+            margin: 140px auto 50px;
+            padding: 30px;
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 6px 20px rgba(0,0,0,.08);
+            text-align: center;
+        }
+
+        .contant-main-img {
+            width: 300px;
+            border-radius: 12px;
+            box-shadow: 2px 2px 12px rgba(0,0,0,.2);
+            margin: 20px 0;
+        }
+
+        .cards-container {
+            display: flex !important;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .info-card {
+            width: 260px;
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 14px rgba(0,0,0,.12);
+            text-align: center;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 18px rgba(0,0,0,.18);
+        }
+
+        .info-card img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+    </style>
+
 </asp:Content>
 
-<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
-    <div class="content-section" style="text-align: center; margin: 20px;">
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+
+    <div class="contant-wrapper">
+
         <h2>ברוכים הבאים</h2>
         <p>כאן תוכלו למצוא מידע נוסף, תמונות וקישורים שימושיים.</p>
 
-        <!-- Image Section -->
-        <div style="margin: 15px;">
-            <img src="pics/הורדה.jpeg" alt="תמונה של הצוות" style="width: 300px; border-radius: 10px; box-shadow: 2px 2px 10px gray;" />
-        </div>
+        <img src="pics/הורדה.jpeg" class="contant-main-img" />
 
-        <!-- Weather Widget Integration -->
         <div style="margin-top: 20px;">
-            <a class="weatherwidget-io" href="https://forecast7.com/he/31d0534d85/israel/" data-label_1="ISRAEL" data-label_2="WEATHER" data-theme="original">ISRAEL WEATHER</a>
+            <a class="weatherwidget-io"
+               href="https://forecast7.com/he/31d0534d85/israel/"
+               data-label_1="ISRAEL"
+               data-label_2="WEATHER"
+               data-theme="original">
+               ISRAEL WEATHER
+            </a>
         </div>
 
-        <!-- Links and Info Boxes -->
-        <div style="display: flex; justify-content: center; gap: 20px; margin-top: 30px;">
-            
-            <!-- Box 1: Homework Help -->
-            <div class="info-box" style="width: 250px; padding: 15px; border: 1px solid #ccc; border-radius: 10px; box-shadow: 2px 2px 10px gray; text-align: center;">
-                <img src="pics/math.jpg" alt="math" style="width: 100%; border-radius: 10px;" onclick="navigateToURL('https://tiktek.com/il/heb-index.htm')" />
-                <p>נתקעתה עם שיעורי בית ? ואתה רוצה לצאת עם חברים</p>
-            </div>
+        <asp:DataList ID="dlCards" runat="server"
+                      RepeatColumns="3"
+                      CssClass="cards-container"
+                      RepeatDirection="Horizontal">
 
-            <!-- Box 2: Scouts Action Reminder -->
-            <div class="info-box" style="width: 250px; padding: 15px; border: 1px solid #ccc; border-radius: 10px; box-shadow: 2px 2px 10px gray; text-align: center;">
-                <img src="pics/scouts.png" alt="scouts" style="width: 100%; border-radius: 10px;" onclick="navigateToURL('https://prod-hamasa.zofim.org.il/he/login/')" />
-                <p>נשאר יום אחד להגיש פעולה ולא התחלתה.</p>
-            </div>
+            <ItemTemplate>
+                <div class="info-card" onclick="navigateToURL('<%# Eval("url") %>')">
+                    <img src='<%# Eval("image") %>' />
+                    <p><%# Eval("text") %></p>
+                </div>
+            </ItemTemplate>
 
-            <!-- Box 3: Chat GPT -->
-            <div class="info-box" style="width: 250px; padding: 15px; border: 1px solid #ccc; border-radius: 10px; box-shadow: 2px 2px 10px gray; text-align: center;">
-                <img src="pics/chat.png" alt="chat" style="width: 100%; border-radius: 10px;" onclick="navigateToURL('https://chatgpt.com/')" />
-                <p>כל דבר אחר</p>
-            </div>
-        </div>
+        </asp:DataList>
+
     </div>
+
 </asp:Content>
