@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Data;
+using System.Globalization;
 using System.Web.UI.WebControls;
 
 public partial class home : System.Web.UI.Page
 {
     calnderservice calendarService = new calnderservice();
     private DataSet allEvents;
+    private static readonly CultureInfo heCulture = new CultureInfo("he-IL");
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -33,13 +35,15 @@ public partial class home : System.Web.UI.Page
         {
             allEvents = (DataSet)ViewState["AllEvents"];
         }
+
+        UpdateCalendarMeta(calendar.SelectedDate);
     }
     
     protected void calendar_SelectionChanged(object sender, EventArgs e)
     {
         DateTime selectedDate = calendar.SelectedDate;
-        lblSelectedDate.Text = $"בחרת את התאריך: {selectedDate:dd/MM/yyyy}";
         ShowEvents(selectedDate);
+        UpdateCalendarMeta(selectedDate);
     }
 
     private void ShowEvents(DateTime date)
@@ -63,14 +67,14 @@ public partial class home : System.Web.UI.Page
                 string note = row["notes"].ToString();
 
                 lblEvents.Text += $@"
-                    <div class='event-card'>
-                        <div class='event-title'>📌 {title}</div>";
+                    <div class='calendar-event'>
+                        <div class='calendar-event-title'>{title}</div>";
 
                 if (!string.IsNullOrEmpty(time))
-                    lblEvents.Text += $"<div class='event-time'>⏰ בשעה {time}</div>";
+                    lblEvents.Text += $"<div class='calendar-event-meta'>⏰ {time}</div>";
 
                 if (!string.IsNullOrEmpty(note))
-                    lblEvents.Text += $"<div class='event-note'>📝 {note}</div>";
+                    lblEvents.Text += $"<div class='calendar-event-note'>📝 {note}</div>";
 
                 lblEvents.Text += "</div>";
                 count++;
@@ -79,7 +83,7 @@ public partial class home : System.Web.UI.Page
 
         if (count == 0)
         {
-            lblEvents.Text = "<div style='color:gray;'>אין אירועים לתאריך הזה.</div>";
+            lblEvents.Text = "<div class='calendar-event empty'>אין אירועים לתאריך הזה.</div>";
         }
     }
 
@@ -109,5 +113,11 @@ public partial class home : System.Web.UI.Page
         }
     }
 
-
+    private void UpdateCalendarMeta(DateTime date)
+    {
+        lblMetaDay.Text = date.ToString("dd");
+        lblMetaWeekday.Text = date.ToString("dddd", heCulture);
+        lblMetaFullDate.Text = date.ToString("dd MMM yyyy", heCulture);
+        lblSelectedDate.Text = $"בחרת את התאריך: {date:dd/MM/yyyy}";
+    }
 }

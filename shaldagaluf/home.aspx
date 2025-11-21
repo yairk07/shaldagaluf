@@ -1,7 +1,7 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/danimaster.master" AutoEventWireup="true" CodeFile="home.aspx.cs" Inherits="home" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
-    <link rel="stylesheet" href="styles.css" />
+    <!-- ה־CSS הראשי כבר נטען מה-Master דרך StyleSheet.css -->
     <script src="JavaScript.js" defer></script>
 </asp:Content>
 
@@ -35,32 +35,46 @@
 
         <section class="home-grid">
             <article class="home-card calendar-card">
-                <div class="card-header">
-                    <div>
-                        <h3>לוח פעילות</h3>
-                        <p class="card-subtitle">בחר תאריך כדי לצפות בכל מה שמתוכנן</p>
-                    </div>
-                    <a class="link-inline" href="editEvent.aspx">ניהול אירועים</a>
-                </div>
+                <div class="calendar-board">
+                    <div class="calendar-meta">
+                        <div class="calendar-meta-date">
+                            <asp:Label ID="lblMetaDay" runat="server" CssClass="calendar-day-number" Text="27" />
+                            <div>
+                                <asp:Label ID="lblMetaWeekday" runat="server" CssClass="calendar-weekday" Text="יום חמישי" />
+                                <asp:Label ID="lblMetaFullDate" runat="server" CssClass="calendar-full-date" Text="27 אפריל 2025" />
+                            </div>
+                        </div>
 
-                <div class="calendar-wrapper">
-                    <asp:Calendar ID="calendar" runat="server"
-                          Width="100%" Height="300px"
-                          CssClass="calendar"
-                          OnSelectionChanged="calendar_SelectionChanged"
-                          OnDayRender="calendar_DayRender" />
-                </div>
-            </article>
+                        <div class="calendar-events-pane">
+                            <div class="calendar-events-header">
+                                <span>אירועים נבחרים</span>
+                                <a class="link-inline" href="allEvents.aspx">לרשימת האירועים</a>
+                            </div>
+                            <div class="calendar-events-scroll">
+                                <asp:Label ID="lblEvents" runat="server" CssClass="calendar-events" />
+                            </div>
+                        </div>
 
-            <article class="home-card events-card">
-                <div class="card-header">
-                    <div>
-                        <h3>האירועים שלך</h3>
-                        <p class="card-subtitle">תוצאה יומית לפי התאריך שבחרת</p>
+                        <a class="calendar-cta" href="tasks.aspx">יצירת אירוע חדש</a>
                     </div>
-                    <a class="link-inline" href="allEvents.aspx">צפייה בכל האירועים</a>
+
+                    <div class="calendar-surface">
+                        <div class="calendar-surface-header">
+                            <div>
+                                <h3>לוח פעילות</h3>
+                                <p class="card-subtitle">בחר תאריך כדי לצפות בכל מה שמתוכנן</p>
+                            </div>
+                            <a class="link-inline" href="editEvent.aspx">ניהול אירועים</a>
+                        </div>
+                        <div class="calendar-wrapper">
+                            <asp:Calendar ID="calendar" runat="server"
+                                  Width="100%" Height="300px"
+                                  CssClass="calendar calendar-modern"
+                                  OnSelectionChanged="calendar_SelectionChanged"
+                                  OnDayRender="calendar_DayRender" />
+                        </div>
+                    </div>
                 </div>
-                <asp:Label ID="lblEvents" runat="server" CssClass="events-feed events-list" />
             </article>
         </section>
 
