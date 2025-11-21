@@ -1,64 +1,151 @@
-## Shaldagaluf – פורטל ניהול אירועים ASP.NET
+# OptiSched - Smart Scheduling & Time Management System
 
-יישום WebForms (‎.NET Framework 4.7.2‎) המאפשר ניהול אירועים, משתמשים ומשימות עבור קהילת "ש״ל דגאלוף". המערכת כוללת רישום והתחברות, חיווי אירועים בלוח שנה, תצוגות אדמין, וטפסי תקשורת.
+**OptiSched** היא מערכת ניהול זמן ומקסום יעילות מבוססת ASP.NET WebForms, המאפשרת ניהול אירועים, משימות ולוח שנה אינטראקטיבי עם תמיכה בלוח שנה עברי ולועזי.
 
-### יכולות עיקריות
-- **ניהול משתמשים**: רישום (`register.aspx`), התחברות (`login.aspx`) וטבלת משתמשים מנהלתית (`exusers.aspx`, `exuserdetails.aspx`) שנשענות על `UsersService`.
-- **יומן ואירועים**: דף הבית מציג לוח שנה אינטראקטיבי, רשימת אירועים אישיים ומשחקון ״רולטה״; שירות `EventService` מספק איסוף אירועים מטבלת `calnder`.
-- **משימות ועמודי תפעול**: דפי `tasks.aspx`, `allEvents.aspx` ו-`editEvent.aspx` מאפשרים צפייה ותחזוקת אירועים ומשימות.
-- **תוכן שיווקי ותקשורת**: עמודי `contactus.aspx`, `contant.aspx`, `termofservice.aspx` מספקים מידע סטטי וטפסי יצירת קשר.
-- **מיתוג ונכסי UI**: הקבצים `StyleSheet.css`, `JavaScript.js` ותיקיית `pics/` מטפלים במראה, באנימציות ובגלריות.
+## 🎯 תכונות עיקריות
 
-### מבנה הפרויקט
+### 📅 לוח שנה חכם
+- **תצוגה כפולה**: מעבר בין לוח שנה עברי ולועזי
+- **מידע יהודי**: תצוגת פרשת השבוע, חגים וזמני כניסת/יציאת שבת
+- **אירועים אינטראקטיביים**: צפייה וניהול אירועים ישירות מהלוח
+- **ניווט מתקדם**: בחירת חודשים ושנים בקלות
+
+### 👥 ניהול משתמשים
+- **רישום והתחברות**: מערכת אימות מלאה עם הרשאות
+- **ניהול משתמשים**: תצוגה ועריכה של פרטי משתמשים (בעלי הרשאות בלבד)
+- **פרופילים מפורטים**: צפייה בפרטי משתמשים מלאים
+
+### 📋 ניהול אירועים ומשימות
+- **יצירת אירועים**: הוספת אירועים עם כותרת, תאריך, שעה והערות
+- **עריכת אירועים**: עדכון אירועים קיימים
+- **תצוגה מרוכזת**: טבלה מפורטת של כל האירועים במערכת
+- **חיפוש מתקדם**: חיפוש אירועים לפי כותרת, משתמש או הערות
+
+### 🎨 עיצוב מודרני
+- **עיצוב רספונסיבי**: מותאם לכל מכשיר (מחשב, טאבלט, נייד)
+- **ערכת צבעים מקצועית**: אדום, שחור ולבן
+- **ממשק משתמש אינטואיטיבי**: ניווט קל ושימוש נוח
+
+## 🏗️ מבנה הפרויקט
+
 ```
 project aluf/
-├── shaldagaluf.sln                  # פתרון VS 2019 (פורמט 12.00)
+├── shaldagaluf.sln                  # פתרון Visual Studio 2019
 ├── shaldagaluf/                     # אתר WebForms
-│   ├── App_Code/                    # שכבת לוגיקה (DAL/BL)
-│   │   ├── Connect.cs               # מחבר ל-Access דרך OleDb
-│   │   ├── UsersService.cs          # CRUD למשתמשים + אימות
-│   │   └── EventService.cs          # שליפת אירועים
-│   ├── App_Data/calnder.db1.accdb.mdb  # בסיס נתונים Access
-│   ├── *.aspx / *.aspx.cs           # עמודי התצוגה וקוד הבק-אנד
-│   ├── danimaster.master            # Master Page מרכזי
-│   ├── StyleSheet.css, JavaScript.js
-│   └── pics/                        # משאבים סטטיים
-└── packages/                        # חבילות NuGet משוחזרות (Roslyn)
+│   ├── App_Code/                    # שכבת לוגיקה עסקית
+│   │   ├── Connect.cs               # חיבור ל-Access Database
+│   │   ├── UsersService.cs         # ניהול משתמשים
+│   │   └── EventService.cs         # ניהול אירועים
+│   ├── App_Data/
+│   │   └── calnder.db1.accdb.mdb   # בסיס נתונים Access
+│   ├── *.aspx / *.aspx.cs          # דפי התצוגה וקוד הבק-אנד
+│   ├── danimaster.master           # Master Page מרכזי
+│   ├── StyleSheet.css              # עיצוב ראשי
+│   ├── JavaScript.js               # סקריפטים צד לקוח
+│   ├── parashaProxy.ashx           # Proxy למידע עברי (Hebcal)
+│   ├── zmanimProxy.ashx            # Proxy לזמני שבת
+│   ├── Default.aspx                # דף ברירת מחדל (מעבר ל-home)
+│   └── pics/                       # תמונות ולוגואים
+│       ├── optisched-logo.svg      # לוגו OptiSched
+│       └── sigma.png               # לוגו ישן (בדף תוכן)
+└── packages/                       # חבילות NuGet
 ```
 
-### דרישות מוקדמות
-- Windows עם ‎.NET Framework 4.7.2‎.
-- Visual Studio 2019 (או חדש יותר שמסוגל לטעון פרויקטי WebForms).
-- ‏[Access Database Engine](https://www.microsoft.com/en-us/download/details.aspx?id=13255) ‎64bit/32bit‎ – נדרש ל-`Microsoft.ACE.OLEDB.12.0`.
-- Git משמש לניהול גרסאות (כבר מוגדר מרחוק אל `https://github.com/yairk07/shaldagaluf`).
+## 📋 דרישות מוקדמות
 
-### הוראות הפעלה מקומית
-1. שיבט את הריפו:  
-   ```bash
-   git clone https://github.com/yairk07/shaldagaluf.git
-   ```
-2. פתח את `shaldagaluf.sln` ב-Visual Studio.
-3. ודא שהפרויקט מוגדר כ-Start Project (קליק ימני → *Set as StartUp Project*).
-4. בדפדפן `Web.config` אין מחרוזות ייחודיות; חיבור ה-DB נקבע ב-`Connect.GetConnectionString()` ומצביע אל `~/App_Data/calnder.db1.accdb.mdb`. ודא שהקובץ לא חסום ע"י אנטי-וירוס ושהאותנטיקציה שלך מאפשרת קריאה/כתיבה.
-5. הרץ עם `F5`. Visual Studio ישיק IIS Express על הפורט שהוגדר בקובץ ‎`.sln` (ברירת מחדל ‎55820‎).
+- **Windows** עם .NET Framework 4.7.2 או חדש יותר
+- **Visual Studio 2019** (או גרסה חדשה יותר התומכת ב-WebForms)
+- **Access Database Engine** ([הורדה](https://www.microsoft.com/en-us/download/details.aspx?id=13255)) - נדרש ל-`Microsoft.ACE.OLEDB.12.0`
+- **Git** לניהול גרסאות
 
-### עבודה עם בסיס הנתונים
-- הקובץ `App_Data/calnder.db1.accdb.mdb` מכיל את טבלאות `Users`, `Citys`, `calnder` ועוד.
-- הקוד משתמש במחברי `OleDbParameter` ולכן אין צורך בעדכון ידני של מחרוזת החיבור, אך אם מזיזים את הקובץ – יש לעדכן את הקבוע `calnder` ב-`Connect.cs`.
-- לגיבוי/שחזור: סגור את IIS Express ו-Visual Studio, העתק את הקובץ, החזר במקרה הצורך והרץ שוב.
+## 🚀 הוראות התקנה והפעלה
 
-### שחזור חבילות
-הפרויקט כולל `packages.config` ותקיית `packages/`. בפתיחה ב-VS, NuGet ישחזר אוטומטית את `Microsoft.CodeDom.Providers.DotNetCompilerPlatform`. אם חסרה, הרץ:
-```powershell
-Update-Package -reinstall
+### 1. שכפול הפרויקט
+```bash
+git clone https://github.com/yairk07/OptiSched.git
+cd OptiSched/project\ aluf
 ```
 
-### שיפורים מוצעים
-- הוספת ‎`.gitignore`‎ כדי למנוע גרסאות של `Bin/` ו-`packages/`.
-- רענון UI ומיתוג אחיד (למשל העברת מחרוזות קשיחות לקובץ משאבים).
-- לוג רישום והקשחת אימות (hash לסיסמאות, reCAPTCHA).
-- בדיקות יחידה עבור `UsersService` ו-`EventService` באמצעות שכבת DAL מופשטת.
+### 2. פתיחת הפרויקט
+1. פתח את `shaldagaluf.sln` ב-Visual Studio
+2. הגדר את הפרויקט כ-StartUp Project (קליק ימני → Set as StartUp Project)
+
+### 3. הגדרת בסיס הנתונים
+- ודא שקובץ `App_Data/calnder.db1.accdb.mdb` קיים ולא חסום
+- החיבור נקבע אוטומטית ב-`Connect.GetConnectionString()`
+- אם הקובץ חסום, שחרר אותו מהאנטי-וירוס
+
+### 4. הפעלת הפרויקט
+- לחץ `F5` או Run ב-Visual Studio
+- הפרויקט יפתח ב-IIS Express על פורט 55820 (ברירת מחדל)
+- דף הבית ייפתח אוטומטית
+
+## 🔧 תכונות טכניות
+
+### לוח שנה עברי/לועזי
+- מעבר דינמי בין תצוגות
+- תאריכים עבריים בתצוגת גימטריה
+- מידע על פרשת השבוע וחגים מ-Hebcal API
+- זמני כניסת/יציאת שבת מ-times.rabaz.co.il API
+
+### Proxies מקומיים
+- `parashaProxy.ashx` - Proxy למידע עברי (Hebcal)
+- `zmanimProxy.ashx` - Proxy לזמני שבת (times.rabaz.co.il)
+- כל הבקשות עוברות דרך השרת המקומי
+
+### אבטחה
+- אימות משתמשים עם Session
+- בדיקת הרשאות לפני עריכת אירועים
+- הגנה מפני גישה לא מורשית
+
+## 📊 בסיס הנתונים
+
+### טבלאות עיקריות
+- **Users** - משתמשים במערכת
+- **Citys** - ערים
+- **calnder** - אירועים ומשימות
+
+### גיבוי ושחזור
+1. סגור את IIS Express ו-Visual Studio
+2. העתק את `App_Data/calnder.db1.accdb.mdb`
+3. לשחזור: החזר את הקובץ והרץ מחדש
+
+## 🎨 עיצוב ומיתוג
+
+- **שם הפרויקט**: OptiSched
+- **לוגו**: `pics/optisched-logo.svg`
+- **צבעים**: אדום (#E50914), שחור (#1c1f25), לבן (#ffffff)
+- **עיצוב**: רספונסיבי, מודרני, מותאם למסכי מחשב רחבים
+
+## 📝 דפים עיקריים
+
+- **home.aspx** - דף הבית עם לוח שנה אינטראקטיבי
+- **tasks.aspx** - יצירה וניהול משימות
+- **allEvents.aspx** - תצוגת כל האירועים בטבלה
+- **editEvent.aspx** - עריכת אירועים
+- **exusers.aspx** - רשימת משתמשים
+- **exuserdetails.aspx** - פרטי משתמש
+- **contant.aspx** - דף תוכן עם מידע נוסף
+- **login.aspx** / **register.aspx** - התחברות ורישום
+
+## 🔄 עדכונים אחרונים
+
+- ✅ עיצוב מחדש של כל הדפים
+- ✅ החזרת allEvents לטבלה מפורטת
+- ✅ עיצוב מודרני לדפי משתמשים
+- ✅ שיפור דף עריכת אירועים
+- ✅ תמיכה בלוח שנה עברי/לועזי
+- ✅ אינטגרציה עם APIs למידע יהודי
+- ✅ עיצוב רספונסיבי למסכי מחשב רחבים
+
+## 🤝 תרומה לפרויקט
+
+לשאלות, הצעות או דיווח על באגים, אנא פתח Issue ב-[GitHub Repository](https://github.com/yairk07/OptiSched).
+
+## 📄 רישיון
+
+כל הזכויות שמורות © 2025 OptiSched
 
 ---
-לשאלות או הפניות נוספות אפשר ליצור קשר דרך `contactus.aspx` או לפתוח Issue במאגר.
 
+**OptiSched** - Smart Scheduling for Maximum Efficiency 🚀
