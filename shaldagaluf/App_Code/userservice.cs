@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Data;
 using System.Data.OleDb;
+using System.Security.Cryptography;
+using System.Text;
 
 public class UsersService
 {
@@ -13,6 +15,20 @@ public class UsersService
     {
         string connectionString = Connect.GetConnectionString();
         myConnection = new OleDbConnection(connectionString);
+    }
+
+    private string HashPassword(string password)
+    {
+        using (SHA256 sha256 = SHA256.Create())
+        {
+            byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                builder.Append(bytes[i].ToString("x2"));
+            }
+            return builder.ToString();
+        }
     }
 
     // ------------------------------
@@ -31,11 +47,13 @@ public class UsersService
 
             OleDbCommand cmd = new OleDbCommand(sSql, myConnection);
 
+            string hashedPassword = HashPassword(password);
+
             cmd.Parameters.AddWithValue("@userName", userName);
             cmd.Parameters.AddWithValue("@firstName", firstName);
             cmd.Parameters.AddWithValue("@lastName", lastName);
             cmd.Parameters.AddWithValue("@Email", email);
-            cmd.Parameters.AddWithValue("@Password", password);
+            cmd.Parameters.AddWithValue("@Password", hashedPassword);
             cmd.Parameters.AddWithValue("@Gender", gender);
             cmd.Parameters.AddWithValue("@YearOfBirth", yearOfBirth);
             cmd.Parameters.AddWithValue("@UserId", userId);
@@ -130,11 +148,12 @@ public class UsersService
         {
             myConnection.Open();
 
+            string hashedPassword = HashPassword(password);
             string sql = "SELECT * FROM Users WHERE userName=@user AND [password]=@pass";
             OleDbCommand cmd = new OleDbCommand(sql, myConnection);
 
             cmd.Parameters.AddWithValue("@user", userName);
-            cmd.Parameters.AddWithValue("@pass", password);
+            cmd.Parameters.AddWithValue("@pass", hashedPassword);
 
             var adp = new OleDbDataAdapter(cmd);
             adp.Fill(ds, "Users");
@@ -145,5 +164,52 @@ public class UsersService
         }
 
         return ds.Tables[0].Rows.Count > 0;
+    }
+
+    public DataRow GetUserByEmail(string email)
+    {
+        DataSet ds = new DataSet();
+
+        try
+        {
+            myConnection.Open();
+
+            string sql = "SELECT * FROM Users WHERE email=@email";
+            OleDbCommand cmd = new OleDbCommand(sql, myConnection);
+
+            cmd.Parameters.AddWithValue("@email", email);
+
+            var adp = new OleDbDataAdapter(cmd);
+            adp.Fill(ds, "Users");
+        }
+        finally
+        {
+            myConnection.Close();
+        }
+
+        if (ds.Tables[0].Rows.Count > 0)
+            return ds.Tables[0].Rows[0];
+        return null;
+    }
+
+    public void UpdatePassword(int userId, string newPassword)
+    {
+        try
+        {
+            myConnection.Open();
+
+            string hashedPassword = HashPassword(newPassword);
+            string sql = "UPDATE Users SET [password]=@pass WHERE id=@id";
+            OleDbCommand cmd = new OleDbCommand(sql, myConnection);
+
+            cmd.Parameters.AddWithValue("@pass", hashedPassword);
+            cmd.Parameters.AddWithValue("@id", userId);
+
+            cmd.ExecuteNonQuery();
+        }
+        finally
+        {
+            myConnection.Close();
+        }
     }
 }

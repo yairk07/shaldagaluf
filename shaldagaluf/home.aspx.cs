@@ -89,7 +89,15 @@ public partial class home : System.Web.UI.Page
                 return; 
             }
 
-            allEvents = calendarService.GetAllEvents();
+            int? userId = null;
+            string role = Session["Role"]?.ToString();
+            
+            if (role != "owner" && Session["userId"] != null)
+            {
+                userId = Convert.ToInt32(Session["userId"]);
+            }
+
+            allEvents = calendarService.GetAllEvents(userId);
             ViewState["AllEvents"] = allEvents;
 
             calendar.SelectedDate = DateTime.Today;
@@ -217,32 +225,36 @@ public partial class home : System.Web.UI.Page
         var sb = new StringBuilder();
         int count = 0;
 
-        foreach (DataRow row in allEvents.Tables[0].Rows)
+        foreach (DataTable table in allEvents.Tables)
         {
-            DateTime eventDate;
-
-            if (!DateTime.TryParse(row["date"].ToString(), out eventDate))
+            foreach (DataRow row in table.Rows)
             {
-                continue;
-            }
+                DateTime eventDate;
 
-            if (eventDate.Date == date.Date)
-            {
-                string title = HttpUtility.HtmlEncode(row["title"].ToString());
-                string time = HttpUtility.HtmlEncode(row["time"].ToString());
-                string note = HttpUtility.HtmlEncode(row["notes"].ToString());
+                if (!DateTime.TryParse(row["date"].ToString(), out eventDate))
+                {
+                    continue;
+                }
 
-                sb.Append("<div class='calendar-event'>");
-                sb.Append("<div class='calendar-event-title'>").Append(title).Append("</div>");
+                if (eventDate.Date == date.Date)
+                {
+                    string title = HttpUtility.HtmlEncode(row["title"].ToString());
+                    string time = HttpUtility.HtmlEncode(row["time"]?.ToString() ?? "");
+                    string note = HttpUtility.HtmlEncode(row["notes"]?.ToString() ?? "");
+                    string eventType = table.TableName == "SharedEvents" ? " (טבלה משותפת)" : "";
 
-                if (!string.IsNullOrEmpty(time))
-                    sb.Append("<div class='calendar-event-meta'>⏰ ").Append(time).Append("</div>");
+                    sb.Append("<div class='calendar-event'>");
+                    sb.Append("<div class='calendar-event-title'>").Append(title).Append(eventType).Append("</div>");
 
-                if (!string.IsNullOrEmpty(note))
-                    sb.Append("<div class='calendar-event-note'>📝 ").Append(note).Append("</div>");
+                    if (!string.IsNullOrEmpty(time))
+                        sb.Append("<div class='calendar-event-meta'>⏰ ").Append(time).Append("</div>");
 
-                sb.Append("</div>");
-                count++;
+                    if (!string.IsNullOrEmpty(note))
+                        sb.Append("<div class='calendar-event-note'>📝 ").Append(note).Append("</div>");
+
+                    sb.Append("</div>");
+                    count++;
+                }
             }
         }
 
@@ -260,20 +272,23 @@ public partial class home : System.Web.UI.Page
         RenderDayNumber(e, currentDay);
         var summaries = new List<string>();
 
-        foreach (DataRow row in allEvents.Tables[0].Rows)
+        foreach (DataTable table in allEvents.Tables)
         {
-            DateTime eventDate;
-
-            if (!DateTime.TryParse(row["date"].ToString(), out eventDate))
-                continue;
-
-            if (eventDate.Date == currentDay)
+            foreach (DataRow row in table.Rows)
             {
-                string title = row["title"].ToString();
-                if (title.Length > 18)
-                    title = title.Substring(0, 18) + "...";
+                DateTime eventDate;
 
-                summaries.Add(HttpUtility.HtmlEncode(title));
+                if (!DateTime.TryParse(row["date"].ToString(), out eventDate))
+                    continue;
+
+                if (eventDate.Date == currentDay)
+                {
+                    string title = row["title"].ToString();
+                    if (title.Length > 18)
+                        title = title.Substring(0, 18) + "...";
+
+                    summaries.Add(HttpUtility.HtmlEncode(title));
+                }
             }
         }
 

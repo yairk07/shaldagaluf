@@ -71,8 +71,8 @@ public partial class editEvent : System.Web.UI.Page
             string sql = @"
                 UPDATE calnder
                 SET title = @title,
-                    date = @date,
-                    time = @time,
+                    [date] = @date,
+                    [time] = @time,
                     notes = @notes
                 WHERE Id = @id";
 

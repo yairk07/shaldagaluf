@@ -28,7 +28,7 @@
                     <div class="user-card">
                         <div class="user-card-header">
                             <div class="user-avatar">
-                                <span><%# Eval("userName").ToString().Substring(0, 1).ToUpper() %></span>
+                                <span><%# GetAvatarLetter(Container.DataItem) %></span>
                             </div>
                             <div class="user-name-section">
                                 <h3 class="user-name"><%# Eval("userName") %></h3>

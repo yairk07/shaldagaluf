@@ -13,7 +13,15 @@ public partial class tasks : System.Web.UI.Page
     {
         if (!IsPostBack)
         {
-            allEvents = calnderService.GetAllEvents();
+            int? userId = null;
+            string role = Session["Role"]?.ToString();
+            
+            if (role != "owner" && Session["userId"] != null)
+            {
+                userId = Convert.ToInt32(Session["userId"]);
+            }
+
+            allEvents = calnderService.GetAllEvents(userId);
             ViewState["AllEvents"] = allEvents;
 
             calendar.SelectedDate = DateTime.Today;
@@ -42,14 +50,25 @@ public partial class tasks : System.Web.UI.Page
 
         if (!string.IsNullOrEmpty(title))
         {
-            calnderService.InsertEvent(title, selectedDate, time, note);
+            int? userId = null;
+            if (Session["userId"] != null)
+            {
+                userId = Convert.ToInt32(Session["userId"]);
+            }
+
+            calnderService.InsertEvent(title, selectedDate, time, note, userId);
 
             txtTitle.Text = "";
             txtTime.Text = "";
             txtNote.Text = "";
 
-            // רענון מידע
-            allEvents = calnderService.GetAllEvents();
+            string role = Session["Role"]?.ToString();
+            int? filterUserId = null;
+            if (role != "owner" && userId.HasValue)
+            {
+                filterUserId = userId;
+            }
+            allEvents = calnderService.GetAllEvents(filterUserId);
             ViewState["AllEvents"] = allEvents;
 
             ShowEvents(selectedDate);
@@ -61,31 +80,35 @@ public partial class tasks : System.Web.UI.Page
         var builder = new StringBuilder();
         int count = 0;
 
-        foreach (DataRow row in allEvents.Tables[0].Rows)
+        foreach (DataTable table in allEvents.Tables)
         {
-            if (row.IsNull("date"))
-                continue;
-
-            DateTime eventDate;
-            if (!DateTime.TryParse(row["date"].ToString(), out eventDate))
-                continue;
-            if (eventDate.Date == date.Date)
+            foreach (DataRow row in table.Rows)
             {
-                string title = HttpUtility.HtmlEncode(row["title"].ToString());
-                string time = HttpUtility.HtmlEncode(row["time"].ToString());
-                string note = HttpUtility.HtmlEncode(row["notes"].ToString());
+                if (row.IsNull("date"))
+                    continue;
 
-                builder.Append("<article class='task-event-card'>");
-                builder.Append("<div class='task-event-title'>📌 ").Append(title).Append("</div>");
+                DateTime eventDate;
+                if (!DateTime.TryParse(row["date"].ToString(), out eventDate))
+                    continue;
+                if (eventDate.Date == date.Date)
+                {
+                    string title = HttpUtility.HtmlEncode(row["title"].ToString());
+                    string time = HttpUtility.HtmlEncode(row["time"]?.ToString() ?? "");
+                    string note = HttpUtility.HtmlEncode(row["notes"]?.ToString() ?? "");
+                    string eventType = table.TableName == "SharedEvents" ? " (טבלה משותפת)" : "";
 
-                if (!string.IsNullOrEmpty(time))
-                    builder.Append("<div class='task-event-meta'>⏰ ").Append(time).Append("</div>");
+                    builder.Append("<article class='task-event-card'>");
+                    builder.Append("<div class='task-event-title'>📌 ").Append(title).Append(eventType).Append("</div>");
 
-                if (!string.IsNullOrEmpty(note))
-                    builder.Append("<div class='task-event-note'>📝 ").Append(note).Append("</div>");
+                    if (!string.IsNullOrEmpty(time))
+                        builder.Append("<div class='task-event-meta'>⏰ ").Append(time).Append("</div>");
 
-                builder.Append("</article>");
-                count++;
+                    if (!string.IsNullOrEmpty(note))
+                        builder.Append("<div class='task-event-note'>📝 ").Append(note).Append("</div>");
+
+                    builder.Append("</article>");
+                    count++;
+                }
             }
         }
 
@@ -102,17 +125,20 @@ public partial class tasks : System.Web.UI.Page
         DateTime currentDay = e.Day.Date;
         int dayCount = 0;
 
-        foreach (DataRow row in allEvents.Tables[0].Rows)
+        foreach (DataTable table in allEvents.Tables)
         {
-            if (row.IsNull("date"))
-                continue;
-
-            DateTime eventDate;
-            if (!DateTime.TryParse(row["date"].ToString(), out eventDate))
-                continue;
-            if (eventDate.Date == currentDay.Date)
+            foreach (DataRow row in table.Rows)
             {
-                dayCount++;
+                if (row.IsNull("date"))
+                    continue;
+
+                DateTime eventDate;
+                if (!DateTime.TryParse(row["date"].ToString(), out eventDate))
+                    continue;
+                if (eventDate.Date == currentDay.Date)
+                {
+                    dayCount++;
+                }
             }
         }
 

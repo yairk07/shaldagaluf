@@ -4,9 +4,9 @@ using System.Data.OleDb;
 
 public class calnderservice
 {
-    public void InsertEvent(string title, DateTime date, string time, string notes)
+    public void InsertEvent(string title, DateTime date, string time, string notes, int? userId = null)
     {
-        string sql = "INSERT INTO calnder ([title], [date], [time], [notes]) VALUES (?, ?, ?, ?)";
+        string sql = "INSERT INTO calnder ([title], [date], [time], [notes], [Userid]) VALUES (?, ?, ?, ?, ?)";
 
         using (OleDbConnection conn = new OleDbConnection(Connect.GetConnectionString()))
         using (OleDbCommand cmd = new OleDbCommand(sql, conn))
@@ -15,25 +15,72 @@ public class calnderservice
             cmd.Parameters.AddWithValue("?", date);
             cmd.Parameters.AddWithValue("?", time);
             cmd.Parameters.AddWithValue("?", notes);
+            cmd.Parameters.AddWithValue("?", userId.HasValue ? (object)userId.Value : DBNull.Value);
 
             conn.Open();
             cmd.ExecuteNonQuery();
         }
     }
 
-    public DataSet GetAllEvents()
+    public DataSet GetAllEvents(int? userId = null)
     {
         DataSet data = new DataSet();
-        string sql = "SELECT * FROM calnder";
-
+        
         using (OleDbConnection conn = new OleDbConnection(Connect.GetConnectionString()))
-        using (OleDbCommand cmd = new OleDbCommand(sql, conn))
-        using (OleDbDataAdapter adapter = new OleDbDataAdapter(cmd))
         {
             conn.Open();
-            adapter.Fill(data);
-            
 
+            string sql = "SELECT * FROM calnder";
+            if (userId.HasValue)
+            {
+                sql += " WHERE Userid = ?";
+            }
+
+            using (OleDbCommand cmd = new OleDbCommand(sql, conn))
+            {
+                if (userId.HasValue)
+                {
+                    cmd.Parameters.AddWithValue("?", userId.Value);
+                }
+
+                using (OleDbDataAdapter adapter = new OleDbDataAdapter(cmd))
+                {
+                    adapter.Fill(data, "PersonalEvents");
+                }
+            }
+
+            if (userId.HasValue)
+            {
+                try
+                {
+                    OleDbCommand testCmd = new OleDbCommand("SELECT TOP 1 * FROM SharedCalendarEvents", conn);
+                    testCmd.ExecuteScalar();
+
+                    string sharedSql = @"
+SELECT 
+    SCE.Id,
+    SCE.CalendarId AS Userid,
+    SCE.Title AS title,
+    SCE.[Date] AS [date],
+    SCE.[Time] AS [time],
+    SCE.Notes AS notes
+FROM SharedCalendarEvents SCE
+INNER JOIN SharedCalendarMembers SCM ON SCE.CalendarId = SCM.CalendarId
+WHERE SCM.UserId = ?";
+
+                    using (OleDbCommand sharedCmd = new OleDbCommand(sharedSql, conn))
+                    {
+                        sharedCmd.Parameters.AddWithValue("?", userId.Value);
+                        using (OleDbDataAdapter sharedAdapter = new OleDbDataAdapter(sharedCmd))
+                        {
+                            sharedAdapter.Fill(data, "SharedEvents");
+                        }
+                    }
+                }
+                catch
+                {
+                }
+            }
         }
 
         return data;

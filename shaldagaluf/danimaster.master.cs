@@ -6,6 +6,9 @@ public partial class danimaster : System.Web.UI.MasterPage
 {
     protected void Page_Load(object sender, EventArgs e)
     {
+        Response.ContentType = "text/html; charset=utf-8";
+        Response.Charset = "utf-8";
+        
         string pageName = System.IO.Path.GetFileNameWithoutExtension(Request.Url.AbsolutePath);
         Body.Attributes["class"] = "page-" + pageName.ToLower();
 
@@ -21,6 +24,9 @@ public partial class danimaster : System.Web.UI.MasterPage
 
         if (linkTasks != null)
             linkTasks.Visible = isLoggedIn;
+
+        if (linkSharedCalendars != null)
+            linkSharedCalendars.Visible = isLoggedIn;
 
         if (linkContent != null)
             linkContent.Visible = isLoggedIn;

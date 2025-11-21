@@ -26,10 +26,10 @@ public class Calendar
         notes = notes;
     }
 
-    public void InsertIntoDb()
+    public void InsertIntoDb(int? userId = null)
     {
         calnderservice cs = new calnderservice();
 
-        cs.InsertEvent(this.title, this.date, this.time, this.notes);
+        cs.InsertEvent(this.title, this.date, this.time, this.notes, userId);
     }
 }

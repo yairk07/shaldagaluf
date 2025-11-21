@@ -54,7 +54,23 @@ public partial class exusers : System.Web.UI.Page
         BindUsers(txtSearchemail.Text);
     }
 
-    // מחזיר את שם העיר לפי העמודה שקיימת בפועל בדאטהסט
+    protected string GetAvatarLetter(object dataItem)
+    {
+        var drv = dataItem as System.Data.DataRowView;
+        if (drv == null) return "?";
+
+        string userName = Convert.ToString(drv["userName"]);
+        if (string.IsNullOrWhiteSpace(userName))
+        {
+            string firstName = Convert.ToString(drv["firstName"]);
+            if (!string.IsNullOrWhiteSpace(firstName))
+                return firstName.Substring(0, 1).ToUpper();
+            return "?";
+        }
+
+        return userName.Substring(0, 1).ToUpper();
+    }
+
     protected string GetCity(object dataItem)
     {
         var drv = dataItem as System.Data.DataRowView;
@@ -63,7 +79,6 @@ public partial class exusers : System.Web.UI.Page
         var table = drv.DataView?.Table;
         if (table == null) return string.Empty;
 
-        // נסיונות לפי שמות עמודות אפשריים
         string[] names = { "CityName", "cityname", "citys.cityname", "c.cityname", "city" };
 
         foreach (var name in names)

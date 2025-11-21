@@ -15,22 +15,31 @@ public partial class allEvents : System.Web.UI.Page
 
     private void BindData(string filter = "")
     {
-        DataTable dt = es.GetAllEvents();
+        int? userId = null;
+        string role = Session["Role"]?.ToString();
+        
+        if (role != "owner" && Session["userId"] != null)
+        {
+            userId = Convert.ToInt32(Session["userId"]);
+        }
+
+        DataTable dt = es.GetAllEvents(userId);
 
         if (!string.IsNullOrWhiteSpace(filter))
         {
             DataView dv = dt.DefaultView;
+            string escapedFilter = filter.Replace("'", "''");
             dv.RowFilter =
-                $"Title LIKE '%{filter}%' " +
-                $"OR UserName LIKE '%{filter}%' " +
-                $"OR Notes LIKE '%{filter}%'";
+                $"Title LIKE '%{escapedFilter}%' " +
+                $"OR UserName LIKE '%{escapedFilter}%' " +
+                $"OR Notes LIKE '%{escapedFilter}%'";
             dt = dv.ToTable();
         }
 
         dlEvents.DataSource = dt;
         dlEvents.DataBind();
 
-        lblResult.Text = filter == ""
+        lblResult.Text = string.IsNullOrWhiteSpace(filter)
             ? ""
             : $"נמצאו {dt.Rows.Count} תוצאות עבור: \"{filter}\"";
     }

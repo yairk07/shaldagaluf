@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data.OleDb;
 using System.Web.UI;
+using System.Security.Cryptography;
+using System.Text;
 
 public partial class login : System.Web.UI.Page
 {
@@ -13,10 +15,26 @@ public partial class login : System.Web.UI.Page
         }
     }
 
+    private string HashPassword(string password)
+    {
+        using (SHA256 sha256 = SHA256.Create())
+        {
+            byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                builder.Append(bytes[i].ToString("x2"));
+            }
+            return builder.ToString();
+        }
+    }
+
     protected void btnLogin_Click(object sender, EventArgs e)
     {
         string username = txtUserName.Text.Trim();
         string password = txtPassword.Text.Trim();
+
+        string hashedPassword = HashPassword(password);
 
         string connStr = Connect.GetConnectionString();
 
@@ -24,26 +42,49 @@ public partial class login : System.Web.UI.Page
         {
             conn.Open();
 
-            string sql = "SELECT userName, role FROM Users WHERE userName=@u AND [password]=@p";
-
+            string sql = "SELECT id, userName, role, [password] FROM Users WHERE userName=@u";
             OleDbCommand cmd = new OleDbCommand(sql, conn);
             cmd.Parameters.AddWithValue("@u", username);
-            cmd.Parameters.AddWithValue("@p", password);
 
             OleDbDataReader dr = cmd.ExecuteReader();
 
-            if (dr.Read()) // ← זה נמצא עכשיו בתוך הפונקציה, במקום הנכון!
+            if (dr.Read())
             {
-                Session["username"] = dr["userName"].ToString();
-                Session["Role"] = dr["role"].ToString();
-                Session["loggedIn"] = true;
+                string dbPassword = dr["password"]?.ToString() ?? "";
+                
+                bool passwordMatch = false;
+                
+                if (dbPassword.Length == 64 && System.Text.RegularExpressions.Regex.IsMatch(dbPassword, @"^[a-f0-9]{64}$"))
+                {
+                    passwordMatch = (dbPassword == hashedPassword);
+                }
+                else
+                {
+                    passwordMatch = (dbPassword == password);
+                    
+                    if (passwordMatch)
+                    {
+                        string updateSql = "UPDATE Users SET [password]=@newPass WHERE id=@id";
+                        OleDbCommand updateCmd = new OleDbCommand(updateSql, conn);
+                        updateCmd.Parameters.AddWithValue("@newPass", hashedPassword);
+                        updateCmd.Parameters.AddWithValue("@id", dr["id"]);
+                        updateCmd.ExecuteNonQuery();
+                    }
+                }
 
-                Response.Redirect("home.aspx");
+                if (passwordMatch)
+                {
+                    Session["username"] = dr["userName"].ToString();
+                    Session["Role"] = dr["role"]?.ToString() ?? "user";
+                    Session["userId"] = dr["id"].ToString();
+                    Session["loggedIn"] = true;
+
+                    Response.Redirect("home.aspx");
+                    return;
+                }
             }
-            else
-            {
-                lblError.Text = "שם משתמש או סיסמה שגויים.";
-            }
+            
+            lblError.Text = "שם משתמש או סיסמה שגויים.";
         }
     }
 }

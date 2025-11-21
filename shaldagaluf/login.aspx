@@ -49,6 +49,7 @@
                 <asp:Label ID="lblError" runat="server" CssClass="auth-error" />
 
                 <div class="auth-support">
+                    <a href="forgotPassword.aspx" style="display: block; margin-bottom: 12px; color: var(--brand); text-decoration: none;">שכחת סיסמה?</a>
                     לא רשומים עדיין? <a href="register.aspx">צרו משתמש חדש</a>
                 </div>
             </div>
