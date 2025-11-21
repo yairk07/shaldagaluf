@@ -21,37 +21,35 @@
 
 <body id="Body" runat="server" style="direction: rtl; text-align: right;">
     <form id="form1" runat="server">
-        <!-- Header with Logo -->
+        <!-- Header with Logo + Navigation -->
         <header id="headerMenu">
-            <img src="pics/sigma.png" alt="לוגו האתר" class="logo"/>
+            <div class="header-inner">
+                <img src="pics/sigma.png" alt="לוגו האתר" class="logo"/>
+
+                <nav class="nav-bar">
+                    <a href="home.aspx">בית</a>
+                    <a href="register.aspx">הרשמה</a>
+                    <a href="tasks.aspx">טופס משימות</a>
+                    <a href="contactus.aspx">צור קשר</a>
+                    <a href="contant.aspx">תוכן</a>
+                    <a href="login.aspx">כניסה</a>
+                    <a href="termofservice.aspx">תנאי שירות</a>
+
+                    <!-- דפים לבעלים בלבד -->
+                    <a href="exusers.aspx" id="linkUsers" runat="server">משתמשים</a>
+                    <a href="allEvents.aspx" id="linkAllEvents" runat="server">כל האירועים</a>
+                    <a href="editEvent.aspx" id="linkEditEvent" runat="server">עריכת אירוע</a>
+
+                    <asp:LinkButton ID="lnkUserName" runat="server" CssClass="logout-btn"
+                        OnClick="lnkUserName_Click">התנתק</asp:LinkButton>
+                </nav>
+            </div>
         </header>
 
         <!-- Main Content Area -->
         <main class="content-container">
             <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server"></asp:ContentPlaceHolder>
         </main>
-
-        <!-- Navigation Bar (Non-Fixed) -->
-       <nav class="nav-bar">
-    <a href="home.aspx">בית</a>
-    <a href="register.aspx">הרשמה</a>
-    <a href="tasks.aspx">טופס משימות</a>
-    <a href="contactus.aspx">צור קשר</a>
-    <a href="contant.aspx">תוכן</a>
-    <a href="login.aspx">כניסה</a>
-    <a href="termofservice.aspx">תנאי שירות</a>
-
-    <!-- דפים לבעלים בלבד -->
-    <a href="exusers.aspx" id="linkUsers" runat="server">משתמשים</a>
-    <a href="allEvents.aspx" id="linkAllEvents" runat="server">כל האירועים</a>
-    <a href="editEvent.aspx" id="linkEditEvent" runat="server">עריכת אירוע</a>
-
-    <asp:LinkButton ID="lnkUserName" runat="server" CssClass="logout-btn"
-        OnClick="lnkUserName_Click">התנתק</asp:LinkButton>
-</nav>
-
-
-        </nav>
 
         <!-- Footer -->
         <footer class="footer">
