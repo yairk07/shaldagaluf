@@ -8,6 +8,7 @@ public partial class danimaster : System.Web.UI.MasterPage
     {
         Response.ContentType = "text/html; charset=utf-8";
         Response.Charset = "utf-8";
+        Response.ContentEncoding = System.Text.Encoding.UTF8;
         
         string pageName = System.IO.Path.GetFileNameWithoutExtension(Request.Url.AbsolutePath);
         Body.Attributes["class"] = "page-" + pageName.ToLower();

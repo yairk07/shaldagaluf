@@ -153,7 +153,7 @@
             <article class="home-card quote-card">
                 <h3>השראה לדרך</h3>
                 <p class="quote">
-                    "הזמן הוא המטבע היחיד שבאמת בבעלותך. הדרך שבה אתה מחליט להשקיע אותו קובעת את איכות היום שלך."
+                    "כלי נשק, כמו כל כלי אחר, אינם טובים או רעים מטבעם - הם רק משקפים את הידיים שמחזיקות בהם. לפעמים האדם הכי מסוכן זה לא מי שיש לו נשק, אלא זה שאין לו נשק אלא סמכות."
                 </p>
             </article>
 
@@ -184,16 +184,12 @@
 
                 <div id="lossSection" class="loss-section" style="display: none;">
                     <div class="loss-wrapper">
-                        <img id="lossImage" src="pics/math.jpg" alt="המלצה" class="loss-gif" />
+                        <img id="lossImage" src="pics/gunauto.gif" alt="המלצה" class="loss-gif" />
                         <div id="loserName" class="loser-name-overlay"></div>
                     </div>
                 </div>
             </article>
 
-            <article class="home-card gif-card">
-                <h3>אנימציית מוטיבציה</h3>
-                <img src="pics/scouts.png" alt="Inspiration board" class="roulette-gif" />
-            </article>
         </section>
     </asp:Panel>
 </asp:Content>

@@ -1,4 +1,4 @@
-<%@ Page Title="טבלאות משותפות" Language="C#" MasterPageFile="~/danimaster.master" AutoEventWireup="true" CodeFile="sharedCalendars.aspx.cs" Inherits="sharedCalendars" %>
+﻿<%@ Page Title="טבלאות משותפות" Language="C#" MasterPageFile="~/danimaster.master" AutoEventWireup="true" CodeFile="sharedCalendars.aspx.cs" Inherits="sharedCalendars" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
 </asp:Content>
@@ -35,25 +35,26 @@
             <asp:Label ID="lblMessage" runat="server" CssClass="form-message"></asp:Label>
 
             <div class="calendars-grid">
+                <asp:Label ID="lblNoCalendars" runat="server" Visible="true" CssClass="no-calendars-message" Text="אין טבלאות משותפות להצגה. לחץ על 'צור טבלה משותפת חדשה' כדי להתחיל." />
                 <asp:DataList ID="dlCalendars" runat="server" RepeatLayout="Flow" CssClass="calendars-list">
                     <ItemTemplate>
                         <div class="calendar-card">
                             <div class="calendar-card-header">
-                                <h3 class="calendar-name"><%# Eval("CalendarName") %></h3>
+                                <h3 class="calendar-name"><%# Eval("CalendarName") ?? "ללא שם" %></h3>
                                 <div class="calendar-badges">
-                                    <%# Convert.ToInt32(Eval("IsAdmin")) == 1 ? "<span class='badge admin'>מנהל</span>" : "" %>
-                                    <%# Convert.ToInt32(Eval("IsMember")) == 1 ? "<span class='badge member'>חבר</span>" : "" %>
+                                    <%# Convert.ToInt32(Eval("IsAdmin") ?? 0) == 1 ? "<span class='badge admin'>מנהל</span>" : "" %>
+                                    <%# Convert.ToInt32(Eval("IsMember") ?? 0) == 1 ? "<span class='badge member'>חבר</span>" : "" %>
                                 </div>
                             </div>
                             <div class="calendar-card-body">
-                                <p class="calendar-description"><%# Eval("Description") %></p>
+                                <p class="calendar-description"><%# Eval("Description") ?? "" %></p>
                                 <div class="calendar-meta">
-                                    <span class="meta-item">יוצר: <%# Eval("CreatorName") %></span>
-                                    <span class="meta-item">תאריך: <%# Convert.ToDateTime(Eval("CreatedDate")).ToString("dd/MM/yyyy") %></span>
+                                    <span class="meta-item">יוצר: <%# Eval("CreatorName") ?? "ללא שם" %></span>
+                                    <span class="meta-item">תאריך: <%# Eval("CreatedDate") != DBNull.Value ? Convert.ToDateTime(Eval("CreatedDate")).ToString("dd/MM/yyyy") : "" %></span>
                                 </div>
                             </div>
                             <div class="calendar-card-footer">
-                                <%# Convert.ToInt32(Eval("IsMember")) == 1 || Convert.ToInt32(Eval("IsAdmin")) == 1
+                                <%# Convert.ToInt32(Eval("IsMember") ?? 0) == 1 || Convert.ToInt32(Eval("IsAdmin") ?? 0) == 1
                                     ? "<a href='sharedCalendarDetails.aspx?id=" + Eval("CalendarId") + "' class='btn-view'>צפה בטבלה</a>"
                                     : "<a href='sharedCalendarDetails.aspx?id=" + Eval("CalendarId") + "' class='btn-join'>הצטרף</a>" %>
                             </div>
@@ -278,6 +279,16 @@
             opacity: 0.6;
         }
 
+        .no-calendars-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 16px;
+            background: var(--surface-alt);
+            border-radius: 12px;
+            margin: 30px 0;
+        }
+
         .calendar-card-footer {
             padding-top: 16px;
             border-top: 1px solid var(--border);
@@ -306,4 +317,3 @@
         }
     </style>
 </asp:Content>
-

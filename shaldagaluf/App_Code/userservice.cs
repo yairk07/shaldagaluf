@@ -43,22 +43,22 @@ public class UsersService
 
             string sSql =
                 "INSERT INTO Users (userName, firstName, lastName, email, [password], gender, yearOfBirth, userId, phonenum, city) " +
-                "VALUES(@userName, @firstName, @lastName, @Email, @Password, @Gender, @YearOfBirth, @UserId, @Phone, @City)";
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             OleDbCommand cmd = new OleDbCommand(sSql, myConnection);
 
             string hashedPassword = HashPassword(password);
 
-            cmd.Parameters.AddWithValue("@userName", userName);
-            cmd.Parameters.AddWithValue("@firstName", firstName);
-            cmd.Parameters.AddWithValue("@lastName", lastName);
-            cmd.Parameters.AddWithValue("@Email", email);
-            cmd.Parameters.AddWithValue("@Password", hashedPassword);
-            cmd.Parameters.AddWithValue("@Gender", gender);
-            cmd.Parameters.AddWithValue("@YearOfBirth", yearOfBirth);
-            cmd.Parameters.AddWithValue("@UserId", userId);
-            cmd.Parameters.AddWithValue("@Phone", phonenum);
-            cmd.Parameters.AddWithValue("@City", city);
+            cmd.Parameters.AddWithValue("?", userName);
+            cmd.Parameters.AddWithValue("?", firstName);
+            cmd.Parameters.AddWithValue("?", lastName);
+            cmd.Parameters.AddWithValue("?", email);
+            cmd.Parameters.AddWithValue("?", hashedPassword);
+            cmd.Parameters.AddWithValue("?", gender);
+            cmd.Parameters.AddWithValue("?", yearOfBirth);
+            cmd.Parameters.AddWithValue("?", userId);
+            cmd.Parameters.AddWithValue("?", phonenum);
+            cmd.Parameters.AddWithValue("?", city);
 
             cmd.ExecuteNonQuery();
         }
@@ -149,11 +149,11 @@ public class UsersService
             myConnection.Open();
 
             string hashedPassword = HashPassword(password);
-            string sql = "SELECT * FROM Users WHERE userName=@user AND [password]=@pass";
+            string sql = "SELECT * FROM Users WHERE userName=? AND [password]=?";
             OleDbCommand cmd = new OleDbCommand(sql, myConnection);
 
-            cmd.Parameters.AddWithValue("@user", userName);
-            cmd.Parameters.AddWithValue("@pass", hashedPassword);
+            cmd.Parameters.AddWithValue("?", userName);
+            cmd.Parameters.AddWithValue("?", hashedPassword);
 
             var adp = new OleDbDataAdapter(cmd);
             adp.Fill(ds, "Users");
@@ -174,10 +174,10 @@ public class UsersService
         {
             myConnection.Open();
 
-            string sql = "SELECT * FROM Users WHERE email=@email";
+            string sql = "SELECT * FROM Users WHERE email=?";
             OleDbCommand cmd = new OleDbCommand(sql, myConnection);
 
-            cmd.Parameters.AddWithValue("@email", email);
+            cmd.Parameters.AddWithValue("?", email);
 
             var adp = new OleDbDataAdapter(cmd);
             adp.Fill(ds, "Users");
@@ -199,11 +199,11 @@ public class UsersService
             myConnection.Open();
 
             string hashedPassword = HashPassword(newPassword);
-            string sql = "UPDATE Users SET [password]=@pass WHERE id=@id";
+            string sql = "UPDATE Users SET [password]=? WHERE id=?";
             OleDbCommand cmd = new OleDbCommand(sql, myConnection);
 
-            cmd.Parameters.AddWithValue("@pass", hashedPassword);
-            cmd.Parameters.AddWithValue("@id", userId);
+            cmd.Parameters.AddWithValue("?", hashedPassword);
+            cmd.Parameters.AddWithValue("?", userId);
 
             cmd.ExecuteNonQuery();
         }

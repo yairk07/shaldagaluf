@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -65,8 +65,13 @@ public partial class sharedCalendarDetails : System.Web.UI.Page
             return;
         }
 
-        isAdmin = service.IsCalendarAdmin(calendarId, currentUserId);
+        string role = Session["Role"]?.ToString() ?? "";
+        bool isOwner = string.Equals(role, "owner", StringComparison.OrdinalIgnoreCase);
+        
+        isAdmin = service.IsCalendarAdmin(calendarId, currentUserId) || isOwner;
         isMember = service.IsCalendarMember(calendarId, currentUserId) || isAdmin;
+
+        System.Diagnostics.Debug.WriteLine($"LoadCalendar: calendarId = {calendarId}, currentUserId = {currentUserId}, role = {role}, isOwner = {isOwner}, isAdmin = {isAdmin}, isMember = {isMember}");
 
         calendarTitle.Text = FixEncoding(calendar["CalendarName"].ToString());
         calendarDescription.Text = FixEncoding(calendar["Description"]?.ToString() ?? "");
@@ -82,6 +87,7 @@ public partial class sharedCalendarDetails : System.Web.UI.Page
             pnlMember.Visible = true;
             btnTabRequests.Visible = isAdmin;
             btnAddEvent.Visible = isAdmin;
+            System.Diagnostics.Debug.WriteLine($"LoadCalendar: btnAddEvent.Visible = {btnAddEvent.Visible}");
             LoadEvents();
         }
     }
@@ -181,42 +187,70 @@ public partial class sharedCalendarDetails : System.Web.UI.Page
 
     protected void btnSaveEvent_Click(object sender, EventArgs e)
     {
-        if (!isAdmin)
+        System.Diagnostics.Debug.WriteLine("btnSaveEvent_Click: Called");
+        
+        string role = Session["Role"]?.ToString() ?? "";
+        bool isOwner = string.Equals(role, "owner", StringComparison.OrdinalIgnoreCase);
+        bool userIsAdmin = isAdmin || isOwner;
+        
+        System.Diagnostics.Debug.WriteLine($"btnSaveEvent_Click: isAdmin = {isAdmin}, isOwner = {isOwner}, userIsAdmin = {userIsAdmin}, calendarId = {calendarId}, currentUserId = {currentUserId}");
+
+        if (!userIsAdmin)
         {
+            System.Diagnostics.Debug.WriteLine("btnSaveEvent_Click: User is not admin or owner, returning");
             return;
         }
 
-        string title = txtEventTitle.Text.Trim();
-        string dateStr = txtEventDate.Text;
-        string time = txtEventTime.Text;
-        string notes = txtEventNotes.Text.Trim();
-
-        if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(dateStr))
+        try
         {
-            return;
+            string title = txtEventTitle.Text.Trim();
+            string dateStr = txtEventDate.Text;
+            string time = txtEventTime.Text;
+            string notes = txtEventNotes.Text.Trim();
+
+            System.Diagnostics.Debug.WriteLine($"btnSaveEvent_Click: title = '{title}', dateStr = '{dateStr}', time = '{time}', notes = '{notes}'");
+
+            if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(dateStr))
+            {
+                System.Diagnostics.Debug.WriteLine("btnSaveEvent_Click: Title or date is empty, returning");
+                return;
+            }
+
+            DateTime eventDate = DateTime.Parse(dateStr);
+            System.Diagnostics.Debug.WriteLine($"btnSaveEvent_Click: eventDate = {eventDate}");
+
+            int? editingId = ViewState["EditingEventId"] as int?;
+            System.Diagnostics.Debug.WriteLine($"btnSaveEvent_Click: editingId = {editingId}");
+            
+            if (editingId.HasValue)
+            {
+                System.Diagnostics.Debug.WriteLine($"btnSaveEvent_Click: Updating event {editingId.Value}");
+                service.UpdateSharedCalendarEvent(editingId.Value, title, eventDate, time, notes);
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"btnSaveEvent_Click: Adding new event to calendar {calendarId}");
+                service.AddSharedCalendarEvent(calendarId, title, eventDate, time, notes, currentUserId);
+            }
+
+            System.Diagnostics.Debug.WriteLine("btnSaveEvent_Click: Event saved successfully");
+            pnlAddEvent.Visible = false;
+            btnAddEvent.Visible = true;
+            ClearEventForm();
+            LoadEvents();
         }
-
-        DateTime eventDate = DateTime.Parse(dateStr);
-
-        int? editingId = ViewState["EditingEventId"] as int?;
-        if (editingId.HasValue)
+        catch (Exception ex)
         {
-            service.UpdateSharedCalendarEvent(editingId.Value, title, eventDate, time, notes);
+            System.Diagnostics.Debug.WriteLine("Error in btnSaveEvent_Click: " + ex.Message);
+            System.Diagnostics.Debug.WriteLine("Stack trace: " + ex.StackTrace);
         }
-        else
-        {
-            service.AddSharedCalendarEvent(calendarId, title, eventDate, time, notes, currentUserId);
-        }
-
-        pnlAddEvent.Visible = false;
-        btnAddEvent.Visible = true;
-        ClearEventForm();
-        LoadEvents();
     }
 
     protected void lnkEdit_Click(object sender, EventArgs e)
     {
-        if (!isAdmin)
+        string role = Session["Role"]?.ToString() ?? "";
+        bool isOwner = string.Equals(role, "owner", StringComparison.OrdinalIgnoreCase);
+        if (!isAdmin && !isOwner)
         {
             return;
         }
@@ -241,7 +275,9 @@ public partial class sharedCalendarDetails : System.Web.UI.Page
 
     protected void lnkDelete_Click(object sender, EventArgs e)
     {
-        if (!isAdmin)
+        string role = Session["Role"]?.ToString() ?? "";
+        bool isOwner = string.Equals(role, "owner", StringComparison.OrdinalIgnoreCase);
+        if (!isAdmin && !isOwner)
         {
             return;
         }
@@ -254,7 +290,9 @@ public partial class sharedCalendarDetails : System.Web.UI.Page
 
     protected void btnApprove_Click(object sender, EventArgs e)
     {
-        if (!isAdmin)
+        string role = Session["Role"]?.ToString() ?? "";
+        bool isOwner = string.Equals(role, "owner", StringComparison.OrdinalIgnoreCase);
+        if (!isAdmin && !isOwner)
         {
             return;
         }
@@ -274,7 +312,9 @@ public partial class sharedCalendarDetails : System.Web.UI.Page
 
     protected void btnReject_Click(object sender, EventArgs e)
     {
-        if (!isAdmin)
+        string role = Session["Role"]?.ToString() ?? "";
+        bool isOwner = string.Equals(role, "owner", StringComparison.OrdinalIgnoreCase);
+        if (!isAdmin && !isOwner)
         {
             return;
         }

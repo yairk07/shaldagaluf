@@ -1,4 +1,4 @@
-<%@ Page Title="טבלה משותפת" Language="C#" MasterPageFile="~/danimaster.master" AutoEventWireup="true" CodeFile="sharedCalendarDetails.aspx.cs" Inherits="sharedCalendarDetails" %>
+﻿<%@ Page Title="טבלה משותפת" Language="C#" MasterPageFile="~/danimaster.master" AutoEventWireup="true" CodeFile="sharedCalendarDetails.aspx.cs" Inherits="sharedCalendarDetails" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
 </asp:Content>
@@ -395,4 +395,3 @@
         }
     </style>
 </asp:Content>
-

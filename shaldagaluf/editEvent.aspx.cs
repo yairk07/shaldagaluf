@@ -30,10 +30,10 @@ public partial class editEvent : System.Web.UI.Page
 
         using (OleDbConnection con = new OleDbConnection(conStr))
         {
-            string sql = "SELECT * FROM calnder WHERE Id = @id";
+            string sql = "SELECT * FROM calnder WHERE Id = ?";
 
             OleDbCommand cmd = new OleDbCommand(sql, con);
-            cmd.Parameters.AddWithValue("@id", eventId);
+            cmd.Parameters.AddWithValue("?", eventId);
 
             con.Open();
             OleDbDataReader dr = cmd.ExecuteReader();
@@ -44,9 +44,9 @@ public partial class editEvent : System.Web.UI.Page
                 return;
             }
 
-            int rowUserId = Convert.ToInt32(dr["UserId"]);
+            int rowUserId = Convert.ToInt32(dr["Userid"]);
             int currentUserId = Convert.ToInt32(Session["userId"]);
-            string role = Session["role"].ToString();
+            string role = Session["Role"]?.ToString() ?? "user";
 
             // בדיקת הרשאות
             if (role != "owner" && rowUserId != currentUserId)
@@ -70,19 +70,19 @@ public partial class editEvent : System.Web.UI.Page
         {
             string sql = @"
                 UPDATE calnder
-                SET title = @title,
-                    [date] = @date,
-                    [time] = @time,
-                    notes = @notes
-                WHERE Id = @id";
+                SET title = ?,
+                    [date] = ?,
+                    [time] = ?,
+                    notes = ?
+                WHERE Id = ?";
 
             OleDbCommand cmd = new OleDbCommand(sql, con);
 
-            cmd.Parameters.AddWithValue("@title", txtTitle.Text);
-            cmd.Parameters.AddWithValue("@date", DateTime.Parse(txtDate.Text));
-            cmd.Parameters.AddWithValue("@time", txtTime.Text);
-            cmd.Parameters.AddWithValue("@notes", txtNotes.Text);
-            cmd.Parameters.AddWithValue("@id", eventId);
+            cmd.Parameters.AddWithValue("?", txtTitle.Text);
+            cmd.Parameters.AddWithValue("?", DateTime.Parse(txtDate.Text));
+            cmd.Parameters.AddWithValue("?", txtTime.Text);
+            cmd.Parameters.AddWithValue("?", txtNotes.Text);
+            cmd.Parameters.AddWithValue("?", eventId);
 
             con.Open();
             cmd.ExecuteNonQuery();

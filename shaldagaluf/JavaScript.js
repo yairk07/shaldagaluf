@@ -1,5 +1,15 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
-    let images = ["pics/gun1.jpg", "pics/gun2.jpg", "pics/knife3.jpg", "pics/knife 4.jpg"];
+    let images = [
+        "pics/gun1.jpg", 
+        "pics/gun2.jpg", 
+        "pics/knife3.jpg", 
+        "pics/knife 4.jpg",
+        "pics/image.png",
+        "pics/jud.png",
+        "pics/knife.png",
+        "pics/mul.png",
+        "pics/pis.png"
+    ];
     let currentIndex = 0;
     let imgElement = document.getElementById("galleryImage");
 
@@ -29,6 +39,11 @@
 
     showImage(currentIndex);
     initializeCalendarData();
+    
+    window.changeImage = function(direction) {
+        currentIndex = (currentIndex + direction + images.length) % images.length;
+        showImage(currentIndex);
+    };
 });
 
 // ווידג'ט מזג אוויר

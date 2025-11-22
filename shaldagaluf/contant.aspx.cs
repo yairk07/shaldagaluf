@@ -24,6 +24,10 @@ public partial class Default3 : System.Web.UI.Page
                         "עזרה בלימודים ",
                         "https://tiktek.com/il/heb-index.htm");
 
+            dt.Rows.Add("pics/github-logo-git-hub-icon-with-text-on-white-and-black-background-free-vector.jpg",
+                        "GitHub",
+                        "https://github.com/yairk07/OptiSched");
+
             dlCards.DataSource = dt;
             dlCards.DataBind();
         }

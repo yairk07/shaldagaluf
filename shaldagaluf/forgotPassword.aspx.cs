@@ -125,10 +125,10 @@ public partial class forgotPassword : System.Web.UI.Page
             string expiry = DateTime.Now.AddHours(1).ToString("yyyy-MM-dd HH:mm:ss");
             string tokenData = $"{token}|{expiry}";
             
-            string sql = "UPDATE Users SET notes = @tokenData WHERE id = @id";
+            string sql = "UPDATE Users SET notes = ? WHERE id = ?";
             System.Data.OleDb.OleDbCommand cmd = new System.Data.OleDb.OleDbCommand(sql, con);
-            cmd.Parameters.AddWithValue("@tokenData", tokenData);
-            cmd.Parameters.AddWithValue("@id", userId);
+            cmd.Parameters.AddWithValue("?", tokenData);
+            cmd.Parameters.AddWithValue("?", userId);
             cmd.ExecuteNonQuery();
         }
     }
@@ -139,9 +139,9 @@ public partial class forgotPassword : System.Web.UI.Page
         using (System.Data.OleDb.OleDbConnection con = new System.Data.OleDb.OleDbConnection(conStr))
         {
             con.Open();
-            string sql = "SELECT id, notes FROM Users WHERE notes LIKE @tokenPattern";
+            string sql = "SELECT id, notes FROM Users WHERE notes LIKE ?";
             System.Data.OleDb.OleDbCommand cmd = new System.Data.OleDb.OleDbCommand(sql, con);
-            cmd.Parameters.AddWithValue("@tokenPattern", token + "%");
+            cmd.Parameters.AddWithValue("?", token + "%");
 
             System.Data.OleDb.OleDbDataReader dr = cmd.ExecuteReader();
             while (dr.Read())
@@ -169,9 +169,9 @@ public partial class forgotPassword : System.Web.UI.Page
         using (System.Data.OleDb.OleDbConnection con = new System.Data.OleDb.OleDbConnection(conStr))
         {
             con.Open();
-            string sql = "UPDATE Users SET notes = NULL WHERE notes LIKE @tokenPattern";
+            string sql = "UPDATE Users SET notes = NULL WHERE notes LIKE ?";
             System.Data.OleDb.OleDbCommand cmd = new System.Data.OleDb.OleDbCommand(sql, con);
-            cmd.Parameters.AddWithValue("@tokenPattern", token + "%");
+            cmd.Parameters.AddWithValue("?", token + "%");
             cmd.ExecuteNonQuery();
         }
     }

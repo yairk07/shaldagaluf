@@ -100,37 +100,75 @@ CREATE TABLE SharedCalendarEvents (
             {
                 con.Open();
 
-                string sql = "";
-                OleDbCommand cmd = null;
-
                 if (userId.HasValue)
                 {
-                    sql = @"
+                    string sql1 = @"
 SELECT 
     SC.Id AS CalendarId,
     SC.Name AS CalendarName,
     SC.Description,
     SC.CreatedBy,
     U.username AS CreatorName,
-    SC.CreatedDate,
-    IIf(SCM.UserId = ?, 1, 0) AS IsMember,
-    IIf(SC.CreatedBy = ?, 1, 0) AS IsAdmin
+    SC.CreatedDate
 FROM SharedCalendars SC
-LEFT JOIN Users U ON SC.CreatedBy = U.id
-LEFT JOIN SharedCalendarMembers SCM ON SC.Id = SCM.CalendarId AND SCM.UserId = ?
-WHERE SC.CreatedBy = ? OR SCM.UserId = ?
-ORDER BY SC.CreatedDate DESC";
+INNER JOIN Users U ON CLng(SC.CreatedBy) = CLng(U.id)
+WHERE SC.CreatedBy = ?";
 
-                    cmd = new OleDbCommand(sql, con);
-                    cmd.Parameters.AddWithValue("?", userId.Value);
-                    cmd.Parameters.AddWithValue("?", userId.Value);
-                    cmd.Parameters.AddWithValue("?", userId.Value);
-                    cmd.Parameters.AddWithValue("?", userId.Value);
-                    cmd.Parameters.AddWithValue("?", userId.Value);
+                    OleDbCommand cmd1 = new OleDbCommand(sql1, con);
+                    cmd1.Parameters.AddWithValue("?", userId.Value);
+                    OleDbDataAdapter da1 = new OleDbDataAdapter(cmd1);
+                    da1.Fill(dt);
+
+                    dt.Columns.Add("IsMember", typeof(int));
+                    dt.Columns.Add("IsAdmin", typeof(int));
+
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        row["IsAdmin"] = 1;
+                        row["IsMember"] = 0;
+                    }
+
+                    string sql2 = @"
+SELECT DISTINCT
+    SC.Id AS CalendarId,
+    SC.Name AS CalendarName,
+    SC.Description,
+    SC.CreatedBy,
+    U.username AS CreatorName,
+    SC.CreatedDate
+FROM (SharedCalendars SC
+INNER JOIN SharedCalendarMembers SCM ON SC.Id = SCM.CalendarId)
+INNER JOIN Users U ON CLng(SC.CreatedBy) = CLng(U.id)
+WHERE CLng(SCM.UserId) = ? AND CLng(SC.CreatedBy) <> ?";
+
+                    OleDbCommand cmd2 = new OleDbCommand(sql2, con);
+                    cmd2.Parameters.AddWithValue("?", userId.Value);
+                    cmd2.Parameters.AddWithValue("?", userId.Value);
+                    OleDbDataAdapter da2 = new OleDbDataAdapter(cmd2);
+                    DataTable dt2 = new DataTable();
+                    da2.Fill(dt2);
+
+                    dt2.Columns.Add("IsMember", typeof(int));
+                    dt2.Columns.Add("IsAdmin", typeof(int));
+
+                    foreach (DataRow row in dt2.Rows)
+                    {
+                        row["IsAdmin"] = 0;
+                        row["IsMember"] = 1;
+                    }
+
+                    foreach (DataRow row in dt2.Rows)
+                    {
+                        dt.ImportRow(row);
+                    }
+
+                    DataView dv = dt.DefaultView;
+                    dv.Sort = "CreatedDate DESC";
+                    dt = dv.ToTable();
                 }
                 else
                 {
-                    sql = @"
+                    string sql = @"
 SELECT 
     SC.Id AS CalendarId,
     SC.Name AS CalendarName,
@@ -141,19 +179,30 @@ SELECT
     0 AS IsMember,
     0 AS IsAdmin
 FROM SharedCalendars SC
-LEFT JOIN Users U ON SC.CreatedBy = U.id
+LEFT JOIN Users U ON CLng(SC.CreatedBy) = CLng(U.id)
 ORDER BY SC.CreatedDate DESC";
 
-                    cmd = new OleDbCommand(sql, con);
+                    OleDbCommand cmd = new OleDbCommand(sql, con);
+                    OleDbDataAdapter da = new OleDbDataAdapter(cmd);
+                    da.Fill(dt);
                 }
-
-                OleDbDataAdapter da = new OleDbDataAdapter(cmd);
-                da.Fill(dt);
             }
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine("Error in GetAllSharedCalendars: " + ex.Message);
+            System.Diagnostics.Debug.WriteLine("Stack trace: " + ex.StackTrace);
+        }
+        
+        System.Diagnostics.Debug.WriteLine($"GetAllSharedCalendars: Returning {dt.Rows.Count} calendars");
+        if (dt.Rows.Count > 0)
+        {
+            System.Diagnostics.Debug.WriteLine("GetAllSharedCalendars: First calendar:");
+            DataRow firstRow = dt.Rows[0];
+            foreach (DataColumn col in dt.Columns)
+            {
+                System.Diagnostics.Debug.WriteLine($"  {col.ColumnName}: {firstRow[col.ColumnName]}");
+            }
         }
 
         return dt;
@@ -166,42 +215,65 @@ ORDER BY SC.CreatedDate DESC";
 
         try
         {
+            System.Diagnostics.Debug.WriteLine($"CreateSharedCalendar: Creating calendar - Name: '{name}', Description: '{description}', CreatedBy: {createdBy}");
+            
             using (OleDbConnection con = new OleDbConnection(conStr))
             {
                 con.Open();
 
+                EnsureTablesExist();
+
                 string sql = "INSERT INTO SharedCalendars (Name, Description, CreatedBy, CreatedDate) VALUES (?, ?, ?, ?)";
                 OleDbCommand cmd = new OleDbCommand(sql, con);
-                cmd.Parameters.AddWithValue("?", name);
+                cmd.Parameters.AddWithValue("?", name ?? "");
                 cmd.Parameters.AddWithValue("?", description ?? "");
-                cmd.Parameters.AddWithValue("?", createdBy);
-                cmd.Parameters.AddWithValue("?", DateTime.Now);
+                OleDbParameter createdByParam = new OleDbParameter("?", OleDbType.BigInt);
+                createdByParam.Value = (long)createdBy;
+                cmd.Parameters.Add(createdByParam);
+                OleDbParameter dateParam = new OleDbParameter("?", OleDbType.Date);
+                dateParam.Value = DateTime.Now;
+                cmd.Parameters.Add(dateParam);
 
                 cmd.ExecuteNonQuery();
+                System.Diagnostics.Debug.WriteLine("CreateSharedCalendar: Calendar inserted successfully");
 
                 cmd.CommandText = "SELECT @@IDENTITY";
                 object result = cmd.ExecuteScalar();
                 if (result != null && result != DBNull.Value)
                 {
                     calendarId = Convert.ToInt32(result);
+                    System.Diagnostics.Debug.WriteLine($"CreateSharedCalendar: Calendar ID: {calendarId}");
 
                     sql = "INSERT INTO SharedCalendarMembers (CalendarId, UserId, Role, JoinedDate) VALUES (?, ?, ?, ?)";
                     cmd.CommandText = sql;
                     cmd.Parameters.Clear();
-                    cmd.Parameters.AddWithValue("?", calendarId);
-                    cmd.Parameters.AddWithValue("?", createdBy);
+                    OleDbParameter calendarIdParam = new OleDbParameter("?", OleDbType.BigInt);
+                    calendarIdParam.Value = (long)calendarId;
+                    cmd.Parameters.Add(calendarIdParam);
+                    OleDbParameter userIdParam = new OleDbParameter("?", OleDbType.BigInt);
+                    userIdParam.Value = (long)createdBy;
+                    cmd.Parameters.Add(userIdParam);
                     cmd.Parameters.AddWithValue("?", "admin");
-                    cmd.Parameters.AddWithValue("?", DateTime.Now);
+                    OleDbParameter joinedDateParam = new OleDbParameter("?", OleDbType.Date);
+                    joinedDateParam.Value = DateTime.Now;
+                    cmd.Parameters.Add(joinedDateParam);
                     cmd.ExecuteNonQuery();
+                    System.Diagnostics.Debug.WriteLine("CreateSharedCalendar: Member added successfully");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("CreateSharedCalendar: Warning - @@IDENTITY returned null");
                 }
             }
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine("Error in CreateSharedCalendar: " + ex.Message);
+            System.Diagnostics.Debug.WriteLine("Stack trace: " + ex.StackTrace);
             throw;
         }
 
+        System.Diagnostics.Debug.WriteLine($"CreateSharedCalendar: Returning calendarId: {calendarId}");
         return calendarId;
     }
 
@@ -283,12 +355,12 @@ SELECT
     JR.RequestDate,
     JR.Message
 FROM JoinRequests JR
-LEFT JOIN Users U ON JR.UserId = U.id
+LEFT JOIN Users U ON CLng(JR.UserId) = CLng(U.id)
 WHERE JR.CalendarId = ? AND JR.Status = 'pending'";
 
                 if (adminUserId.HasValue)
                 {
-                    sql += " AND EXISTS (SELECT 1 FROM SharedCalendars SC WHERE SC.Id = ? AND SC.CreatedBy = ?)";
+                    sql += " AND EXISTS (SELECT 1 FROM SharedCalendars SC WHERE SC.Id = ? AND CLng(SC.CreatedBy) = ?)";
                 }
 
                 sql += " ORDER BY JR.RequestDate DESC";
@@ -384,12 +456,12 @@ SELECT
     U.username AS CreatedByName,
     SCE.CreatedDate
 FROM SharedCalendarEvents SCE
-LEFT JOIN Users U ON SCE.CreatedBy = U.id
+LEFT JOIN Users U ON CLng(SCE.CreatedBy) = CLng(U.id)
 WHERE SCE.CalendarId = ?";
 
                 if (userId.HasValue)
                 {
-                    sql += " AND EXISTS (SELECT 1 FROM SharedCalendarMembers SCM WHERE SCM.CalendarId = ? AND SCM.UserId = ?)";
+                    sql += " AND EXISTS (SELECT 1 FROM SharedCalendarMembers SCM WHERE SCM.CalendarId = ? AND CLng(SCM.UserId) = ?)";
                 }
 
                 sql += " ORDER BY SCE.[Date] DESC, SCE.[Time] DESC";
@@ -426,13 +498,21 @@ WHERE SCE.CalendarId = ?";
 
                 string sql = "INSERT INTO SharedCalendarEvents (CalendarId, Title, [Date], [Time], Notes, CreatedBy, CreatedDate) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 OleDbCommand cmd = new OleDbCommand(sql, con);
-                cmd.Parameters.AddWithValue("?", calendarId);
-                cmd.Parameters.AddWithValue("?", title);
-                cmd.Parameters.AddWithValue("?", date);
+                OleDbParameter calendarIdParam = new OleDbParameter("?", OleDbType.BigInt);
+                calendarIdParam.Value = (long)calendarId;
+                cmd.Parameters.Add(calendarIdParam);
+                cmd.Parameters.AddWithValue("?", title ?? "");
+                OleDbParameter dateParam = new OleDbParameter("?", OleDbType.Date);
+                dateParam.Value = date;
+                cmd.Parameters.Add(dateParam);
                 cmd.Parameters.AddWithValue("?", time ?? "");
                 cmd.Parameters.AddWithValue("?", notes ?? "");
-                cmd.Parameters.AddWithValue("?", createdBy);
-                cmd.Parameters.AddWithValue("?", DateTime.Now);
+                OleDbParameter createdByParam = new OleDbParameter("?", OleDbType.BigInt);
+                createdByParam.Value = (long)createdBy;
+                cmd.Parameters.Add(createdByParam);
+                OleDbParameter createdDateParam = new OleDbParameter("?", OleDbType.Date);
+                createdDateParam.Value = DateTime.Now;
+                cmd.Parameters.Add(createdDateParam);
 
                 cmd.ExecuteNonQuery();
             }
@@ -456,11 +536,15 @@ WHERE SCE.CalendarId = ?";
 
                 string sql = "UPDATE SharedCalendarEvents SET Title = ?, [Date] = ?, [Time] = ?, Notes = ? WHERE Id = ?";
                 OleDbCommand cmd = new OleDbCommand(sql, con);
-                cmd.Parameters.AddWithValue("?", title);
-                cmd.Parameters.AddWithValue("?", date);
+                cmd.Parameters.AddWithValue("?", title ?? "");
+                OleDbParameter dateParam = new OleDbParameter("?", OleDbType.Date);
+                dateParam.Value = date;
+                cmd.Parameters.Add(dateParam);
                 cmd.Parameters.AddWithValue("?", time ?? "");
                 cmd.Parameters.AddWithValue("?", notes ?? "");
-                cmd.Parameters.AddWithValue("?", eventId);
+                OleDbParameter eventIdParam = new OleDbParameter("?", OleDbType.BigInt);
+                eventIdParam.Value = (long)eventId;
+                cmd.Parameters.Add(eventIdParam);
 
                 cmd.ExecuteNonQuery();
             }
@@ -506,7 +590,7 @@ WHERE SCE.CalendarId = ?";
             {
                 con.Open();
 
-                string sql = "SELECT COUNT(*) FROM SharedCalendars WHERE Id = ? AND CreatedBy = ?";
+                string sql = "SELECT COUNT(*) FROM SharedCalendars WHERE Id = ? AND CLng(CreatedBy) = ?";
                 OleDbCommand cmd = new OleDbCommand(sql, con);
                 cmd.Parameters.AddWithValue("?", calendarId);
                 cmd.Parameters.AddWithValue("?", userId);
@@ -531,7 +615,7 @@ WHERE SCE.CalendarId = ?";
             {
                 con.Open();
 
-                string sql = "SELECT COUNT(*) FROM SharedCalendarMembers WHERE CalendarId = ? AND UserId = ?";
+                string sql = "SELECT COUNT(*) FROM SharedCalendarMembers WHERE CalendarId = ? AND CLng(UserId) = ?";
                 OleDbCommand cmd = new OleDbCommand(sql, con);
                 cmd.Parameters.AddWithValue("?", calendarId);
                 cmd.Parameters.AddWithValue("?", userId);
@@ -566,7 +650,7 @@ SELECT
     U.username AS CreatorName,
     SC.CreatedDate
 FROM SharedCalendars SC
-LEFT JOIN Users U ON SC.CreatedBy = U.id
+LEFT JOIN Users U ON CLng(SC.CreatedBy) = CLng(U.id)
 WHERE SC.Id = ?";
 
                 OleDbCommand cmd = new OleDbCommand(sql, con);

@@ -42,9 +42,9 @@ public partial class login : System.Web.UI.Page
         {
             conn.Open();
 
-            string sql = "SELECT id, userName, role, [password] FROM Users WHERE userName=@u";
+            string sql = "SELECT id, userName, role, [password] FROM Users WHERE userName=?";
             OleDbCommand cmd = new OleDbCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@u", username);
+            cmd.Parameters.AddWithValue("?", username);
 
             OleDbDataReader dr = cmd.ExecuteReader();
 
@@ -64,10 +64,10 @@ public partial class login : System.Web.UI.Page
                     
                     if (passwordMatch)
                     {
-                        string updateSql = "UPDATE Users SET [password]=@newPass WHERE id=@id";
+                        string updateSql = "UPDATE Users SET [password]=? WHERE id=?";
                         OleDbCommand updateCmd = new OleDbCommand(updateSql, conn);
-                        updateCmd.Parameters.AddWithValue("@newPass", hashedPassword);
-                        updateCmd.Parameters.AddWithValue("@id", dr["id"]);
+                        updateCmd.Parameters.AddWithValue("?", hashedPassword);
+                        updateCmd.Parameters.AddWithValue("?", dr["id"]);
                         updateCmd.ExecuteNonQuery();
                     }
                 }
