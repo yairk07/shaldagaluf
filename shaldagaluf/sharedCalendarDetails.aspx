@@ -53,9 +53,19 @@
                                     <asp:TextBox ID="txtEventTime" runat="server" TextMode="Time" CssClass="form-input"></asp:TextBox>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">הערות</label>
-                                    <asp:TextBox ID="txtEventNotes" runat="server" TextMode="MultiLine" Rows="3" CssClass="form-input" placeholder="הערות נוספות"></asp:TextBox>
+                                    <label class="form-label">קטגוריה</label>
+                                    <asp:DropDownList ID="ddlEventCategory" runat="server" CssClass="form-input">
+                                        <asp:ListItem Text="אירוע" Value="אירוע" Selected="True"></asp:ListItem>
+                                        <asp:ListItem Text="יום הולדת" Value="יום הולדת"></asp:ListItem>
+                                        <asp:ListItem Text="פגישה" Value="פגישה"></asp:ListItem>
+                                        <asp:ListItem Text="מטלה" Value="מטלה"></asp:ListItem>
+                                        <asp:ListItem Text="אחר" Value="אחר"></asp:ListItem>
+                                    </asp:DropDownList>
                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">הערות</label>
+                                <asp:TextBox ID="txtEventNotes" runat="server" TextMode="MultiLine" Rows="3" CssClass="form-input" placeholder="הערות נוספות"></asp:TextBox>
                             </div>
                             <div class="form-actions">
                                 <asp:Button ID="btnSaveEvent" runat="server" Text="שמור אירוע" OnClick="btnSaveEvent_Click" CssClass="btn-save" />
@@ -75,6 +85,7 @@
                                             <th>כותרת</th>
                                             <th>תאריך</th>
                                             <th>שעה</th>
+                                            <th>קטגוריה</th>
                                             <th>הערות</th>
                                             <th>נוצר על ידי</th>
                                             <th>פעולות</th>
@@ -87,6 +98,7 @@
                                             <td><%# Eval("Title") %></td>
                                             <td><%# Convert.ToDateTime(Eval("EventDate")).ToString("dd/MM/yyyy") %></td>
                                             <td><%# Eval("EventTime") %></td>
+                                            <td><%# Eval("Category") ?? "אחר" %></td>
                                             <td><%# Eval("Notes") %></td>
                                             <td><%# Eval("CreatedByName") %></td>
                                             <td>

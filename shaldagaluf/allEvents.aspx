@@ -17,10 +17,20 @@
     </div>
 
     <div class="search-section">
-        <asp:TextBox ID="txtSearch" runat="server" CssClass="search-box" 
-                     Placeholder="חפש לפי כותרת / שם משתמש / הערות"></asp:TextBox>
-        <asp:Button ID="btnSearch" runat="server" Text="חפש" CssClass="search-btn"
-                    OnClick="btnSearch_Click" />
+        <div class="search-row">
+            <asp:TextBox ID="txtSearch" runat="server" CssClass="search-box" 
+                         Placeholder="חפש לפי כותרת / שם משתמש / הערות"></asp:TextBox>
+            <asp:DropDownList ID="ddlCategoryFilter" runat="server" CssClass="category-filter" AutoPostBack="true" OnSelectedIndexChanged="ddlCategoryFilter_SelectedIndexChanged">
+                <asp:ListItem Text="כל הקטגוריות" Value="" Selected="True"></asp:ListItem>
+                <asp:ListItem Text="אירוע" Value="אירוע"></asp:ListItem>
+                <asp:ListItem Text="יום הולדת" Value="יום הולדת"></asp:ListItem>
+                <asp:ListItem Text="פגישה" Value="פגישה"></asp:ListItem>
+                <asp:ListItem Text="מטלה" Value="מטלה"></asp:ListItem>
+                <asp:ListItem Text="אחר" Value="אחר"></asp:ListItem>
+            </asp:DropDownList>
+            <asp:Button ID="btnSearch" runat="server" Text="חפש" CssClass="search-btn"
+                        OnClick="btnSearch_Click" />
+        </div>
     </div>
 
     <asp:Label ID="lblResult" runat="server" CssClass="search-result"></asp:Label>
@@ -39,6 +49,7 @@
                                 <th>משתמש</th>
                                 <th>תאריך</th>
                                 <th>שעה</th>
+                                <th>קטגוריה</th>
                                 <th>הערות</th>
                                 <th>פעולות</th>
                             </tr>
@@ -51,6 +62,7 @@
                                 <td><%# Eval("UserName") %> (#<%# Eval("UserId") %>)</td>
                                 <td><%# Eval("EventDate", "{0:dd/MM/yyyy}") %></td>
                                 <td><%# Eval("EventTime") %></td>
+                                <td><%# (Eval("Category") != null && Eval("Category") != DBNull.Value && !string.IsNullOrWhiteSpace(Eval("Category").ToString())) ? Eval("Category") : "אחר" %></td>
                                 <td><%# Eval("Notes") %></td>
                                 <td><a href='editEvent.aspx?id=<%# Eval("Id") %>' class="edit-link">ערוך</a></td>
                             </tr>
@@ -234,6 +246,32 @@
             width: 70%;
             margin: 20px auto;
             text-align: center;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .category-filter {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            direction: rtl;
+            background: var(--surface);
+            color: var(--text);
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        .category-filter:focus {
+            outline: none;
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.1);
         }
 
         .view-panel {

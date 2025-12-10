@@ -34,6 +34,16 @@
                     <asp:TextBox ID="txtTime" runat="server" CssClass="task-input" placeholder="לדוגמה 14:30" />
                 </div>
                 <div class="calendar-meta-line">
+                    <span class="meta-label">קטגוריה</span>
+                    <asp:DropDownList ID="ddlCategory" runat="server" CssClass="task-input">
+                        <asp:ListItem Text="אירוע" Value="אירוע" Selected="True"></asp:ListItem>
+                        <asp:ListItem Text="יום הולדת" Value="יום הולדת"></asp:ListItem>
+                        <asp:ListItem Text="פגישה" Value="פגישה"></asp:ListItem>
+                        <asp:ListItem Text="מטלה" Value="מטלה"></asp:ListItem>
+                        <asp:ListItem Text="אחר" Value="אחר"></asp:ListItem>
+                    </asp:DropDownList>
+                </div>
+                <div class="calendar-meta-line">
                     <span class="meta-label">הערות</span>
                     <asp:TextBox ID="txtNote" runat="server" CssClass="task-input" TextMode="MultiLine" Rows="2" placeholder="פרטים נוספים" />
                 </div>

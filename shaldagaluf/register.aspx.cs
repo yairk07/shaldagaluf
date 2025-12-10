@@ -17,20 +17,13 @@ public partial class register : System.Web.UI.Page
 
     private void BindCities()
     {
-        using (var con = new OleDbConnection(Connect.GetConnectionString()))
-        using (var cmd = new OleDbCommand("SELECT id, cityname FROM Citys WHERE id Is Not Null ORDER BY cityname", con))
-        using (var da = new OleDbDataAdapter(cmd))
-        {
-            var dt = new DataTable();
-            con.Open();
-            da.Fill(dt);
+        CityService cityService = new CityService();
+        DataTable dt = cityService.GetAllCities();
 
-            // שומר את פריט "בחר עיר" שכבר נמצא ב-ASPX
-            ddlOptions.DataSource = dt;
-            ddlOptions.DataTextField = "cityname";
-            ddlOptions.DataValueField = "id";
-            ddlOptions.DataBind();
-        }
+        ddlOptions.DataSource = dt;
+        ddlOptions.DataTextField = "cityname";
+        ddlOptions.DataValueField = "id";
+        ddlOptions.DataBind();
     }
 
     protected void btnRegister_Click(object sender, EventArgs e)

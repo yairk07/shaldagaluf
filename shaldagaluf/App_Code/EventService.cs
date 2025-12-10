@@ -34,7 +34,8 @@ SELECT
     C.title AS Title,
     C.[date] AS EventDate,
     C.[time] AS EventTime,
-    C.notes AS Notes
+    C.notes AS Notes,
+    C.category AS Category
 FROM calnder AS C";
             
             if (userId.HasValue)
@@ -92,6 +93,12 @@ FROM calnder AS C";
                 {
                     row["UserName"] = "";
                 }
+                
+                if (row["Category"] == DBNull.Value || row["Category"] == null || string.IsNullOrWhiteSpace(row["Category"].ToString()))
+                {
+                    row["Category"] = "אחר";
+                }
+                
                 row["EventType"] = "personal";
             }
 
@@ -107,7 +114,8 @@ SELECT
     SCE.Title       AS Title,
     SCE.[Date]      AS EventDate,
     SCE.[Time]      AS EventTime,
-    SCE.Notes       AS Notes
+    SCE.Notes       AS Notes,
+    SCE.Category    AS Category
 FROM SharedCalendarEvents SCE
 INNER JOIN SharedCalendarMembers SCM ON SCE.CalendarId = SCM.CalendarId
 WHERE SCM.UserId = ?";
@@ -139,6 +147,12 @@ WHERE SCM.UserId = ?";
                     {
                         row["UserName"] = "";
                     }
+                    
+                    if (row["Category"] == DBNull.Value || row["Category"] == null || string.IsNullOrWhiteSpace(row["Category"].ToString()))
+                    {
+                        row["Category"] = "אחר";
+                    }
+                    
                     row["EventType"] = "shared";
                 }
 

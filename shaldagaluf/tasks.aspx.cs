@@ -47,6 +47,7 @@ public partial class tasks : System.Web.UI.Page
         string title = txtTitle.Text.Trim();
         string time = txtTime.Text.Trim();
         string note = txtNote.Text.Trim();
+        string category = ddlCategory.SelectedValue;
 
         if (!string.IsNullOrEmpty(title))
         {
@@ -56,11 +57,12 @@ public partial class tasks : System.Web.UI.Page
                 userId = Convert.ToInt32(Session["userId"]);
             }
 
-            calnderService.InsertEvent(title, selectedDate, time, note, userId);
+            calnderService.InsertEvent(title, selectedDate, time, note, category, userId);
 
             txtTitle.Text = "";
             txtTime.Text = "";
             txtNote.Text = "";
+            ddlCategory.SelectedIndex = 0;
 
             string role = Session["Role"]?.ToString();
             int? filterUserId = null;
@@ -95,10 +97,12 @@ public partial class tasks : System.Web.UI.Page
                     string title = HttpUtility.HtmlEncode(row["title"].ToString());
                     string time = HttpUtility.HtmlEncode(row["time"]?.ToString() ?? "");
                     string note = HttpUtility.HtmlEncode(row["notes"]?.ToString() ?? "");
+                    string category = HttpUtility.HtmlEncode(row["category"]?.ToString() ?? "אחר");
                     string eventType = table.TableName == "SharedEvents" ? " (טבלה משותפת)" : "";
 
                     builder.Append("<article class='task-event-card'>");
                     builder.Append("<div class='task-event-title'>📌 ").Append(title).Append(eventType).Append("</div>");
+                    builder.Append("<div class='task-event-category'>🏷️ ").Append(category).Append("</div>");
 
                     if (!string.IsNullOrEmpty(time))
                         builder.Append("<div class='task-event-meta'>⏰ ").Append(time).Append("</div>");

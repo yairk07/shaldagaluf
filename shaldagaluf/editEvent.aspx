@@ -32,6 +32,17 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label">קטגוריה</label>
+                        <asp:DropDownList ID="ddlCategory" runat="server" CssClass="form-input">
+                            <asp:ListItem Text="אירוע" Value="אירוע"></asp:ListItem>
+                            <asp:ListItem Text="יום הולדת" Value="יום הולדת"></asp:ListItem>
+                            <asp:ListItem Text="פגישה" Value="פגישה"></asp:ListItem>
+                            <asp:ListItem Text="מטלה" Value="מטלה"></asp:ListItem>
+                            <asp:ListItem Text="אחר" Value="אחר"></asp:ListItem>
+                        </asp:DropDownList>
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label">הערות</label>
                         <asp:TextBox ID="txtNotes" runat="server" TextMode="MultiLine" Rows="5" CssClass="form-input form-textarea" placeholder="הזן הערות נוספות (אופציונלי)" />
                     </div>

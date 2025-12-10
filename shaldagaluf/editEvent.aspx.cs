@@ -59,6 +59,15 @@ public partial class editEvent : System.Web.UI.Page
             txtDate.Text = Convert.ToDateTime(dr["date"]).ToString("yyyy-MM-dd");
             txtTime.Text = dr["time"].ToString();
             txtNotes.Text = dr["notes"].ToString();
+            
+            if (dr["category"] != DBNull.Value && dr["category"] != null)
+            {
+                string category = dr["category"].ToString();
+                if (ddlCategory.Items.FindByValue(category) != null)
+                {
+                    ddlCategory.SelectedValue = category;
+                }
+            }
         }
     }
 
@@ -73,7 +82,8 @@ public partial class editEvent : System.Web.UI.Page
                 SET title = ?,
                     [date] = ?,
                     [time] = ?,
-                    notes = ?
+                    notes = ?,
+                    category = ?
                 WHERE Id = ?";
 
             OleDbCommand cmd = new OleDbCommand(sql, con);
@@ -82,6 +92,7 @@ public partial class editEvent : System.Web.UI.Page
             cmd.Parameters.AddWithValue("?", DateTime.Parse(txtDate.Text));
             cmd.Parameters.AddWithValue("?", txtTime.Text);
             cmd.Parameters.AddWithValue("?", txtNotes.Text);
+            cmd.Parameters.AddWithValue("?", ddlCategory.SelectedValue);
             cmd.Parameters.AddWithValue("?", eventId);
 
             con.Open();

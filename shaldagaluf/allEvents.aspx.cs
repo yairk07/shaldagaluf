@@ -55,6 +55,20 @@ public partial class allEvents : System.Web.UI.Page
                 System.Diagnostics.Debug.WriteLine("LoadEventsData: Renamed 'time' to 'EventTime'");
             }
             
+            if (!dt.Columns.Contains("Category"))
+            {
+                dt.Columns.Add("Category", typeof(string));
+                System.Diagnostics.Debug.WriteLine("LoadEventsData: Added Category column");
+            }
+            
+            foreach (DataRow row in dt.Rows)
+            {
+                if (row["Category"] == DBNull.Value || row["Category"] == null || string.IsNullOrWhiteSpace(row["Category"].ToString()))
+                {
+                    row["Category"] = "אחר";
+                }
+            }
+            
             if (dt.Rows.Count > 0)
             {
                 DataRow firstRow = dt.Rows[0];
@@ -137,27 +151,58 @@ public partial class allEvents : System.Web.UI.Page
         }
     }
 
-    private void BindData(string filter = "")
+    private void BindData(string filter = "", string categoryFilter = "")
     {
         DataTable dt = LoadEventsData();
+        DataTable filteredDt = dt.Clone();
 
-        if (!string.IsNullOrWhiteSpace(filter))
+        foreach (DataRow row in dt.Rows)
         {
-            DataView dv = dt.DefaultView;
-            string escapedFilter = filter.Replace("'", "''");
-            dv.RowFilter =
-                $"Title LIKE '%{escapedFilter}%' " +
-                $"OR UserName LIKE '%{escapedFilter}%' " +
-                $"OR Notes LIKE '%{escapedFilter}%'";
-            dt = dv.ToTable();
+            bool matchesFilter = true;
+            bool matchesCategory = true;
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                string title = row["Title"]?.ToString() ?? "";
+                string userName = row["UserName"]?.ToString() ?? "";
+                string notes = row["Notes"]?.ToString() ?? "";
+                
+                string searchLower = filter.ToLower();
+                matchesFilter = title.ToLower().Contains(searchLower) ||
+                               userName.ToLower().Contains(searchLower) ||
+                               notes.ToLower().Contains(searchLower);
+            }
+
+            if (!string.IsNullOrWhiteSpace(categoryFilter))
+            {
+                string category = row["Category"]?.ToString() ?? "אחר";
+                matchesCategory = category == categoryFilter;
+            }
+
+            if (matchesFilter && matchesCategory)
+            {
+                filteredDt.ImportRow(row);
+            }
         }
 
-        dlEvents.DataSource = dt;
+        dlEvents.DataSource = filteredDt;
         dlEvents.DataBind();
 
-        lblResult.Text = string.IsNullOrWhiteSpace(filter)
-            ? ""
-            : $"נמצאו {dt.Rows.Count} תוצאות עבור: \"{filter}\"";
+        string resultMessage = "";
+        if (!string.IsNullOrWhiteSpace(filter) && !string.IsNullOrWhiteSpace(categoryFilter))
+        {
+            resultMessage = $"נמצאו {filteredDt.Rows.Count} תוצאות עבור: \"{filter}\" בקטגוריה \"{categoryFilter}\"";
+        }
+        else if (!string.IsNullOrWhiteSpace(filter))
+        {
+            resultMessage = $"נמצאו {filteredDt.Rows.Count} תוצאות עבור: \"{filter}\"";
+        }
+        else if (!string.IsNullOrWhiteSpace(categoryFilter))
+        {
+            resultMessage = $"נמצאו {filteredDt.Rows.Count} תוצאות בקטגוריה: \"{categoryFilter}\"";
+        }
+
+        lblResult.Text = resultMessage;
     }
 
     private void BindCalendar()
@@ -230,7 +275,21 @@ public partial class allEvents : System.Web.UI.Page
     protected void btnSearch_Click(object sender, EventArgs e)
     {
         string search = txtSearch.Text.Trim();
-        BindData(search);
+        string categoryFilter = ddlCategoryFilter.SelectedValue;
+        
+        if (string.IsNullOrWhiteSpace(search) && string.IsNullOrWhiteSpace(categoryFilter))
+        {
+            ClearEventsCache();
+        }
+        
+        BindData(search, categoryFilter);
+    }
+
+    protected void ddlCategoryFilter_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        string search = txtSearch.Text.Trim();
+        string categoryFilter = ddlCategoryFilter.SelectedValue;
+        BindData(search, categoryFilter);
     }
 
     protected void btnViewToggle_Click(object sender, EventArgs e)

@@ -207,6 +207,7 @@ public partial class sharedCalendarDetails : System.Web.UI.Page
             string dateStr = txtEventDate.Text;
             string time = txtEventTime.Text;
             string notes = txtEventNotes.Text.Trim();
+            string category = ddlEventCategory.SelectedValue;
 
             System.Diagnostics.Debug.WriteLine($"btnSaveEvent_Click: title = '{title}', dateStr = '{dateStr}', time = '{time}', notes = '{notes}'");
 
@@ -225,12 +226,12 @@ public partial class sharedCalendarDetails : System.Web.UI.Page
             if (editingId.HasValue)
             {
                 System.Diagnostics.Debug.WriteLine($"btnSaveEvent_Click: Updating event {editingId.Value}");
-                service.UpdateSharedCalendarEvent(editingId.Value, title, eventDate, time, notes);
+                service.UpdateSharedCalendarEvent(editingId.Value, title, eventDate, time, notes, category);
             }
             else
             {
                 System.Diagnostics.Debug.WriteLine($"btnSaveEvent_Click: Adding new event to calendar {calendarId}");
-                service.AddSharedCalendarEvent(calendarId, title, eventDate, time, notes, currentUserId);
+                service.AddSharedCalendarEvent(calendarId, title, eventDate, time, notes, category, currentUserId);
             }
 
             System.Diagnostics.Debug.WriteLine("btnSaveEvent_Click: Event saved successfully");
@@ -267,6 +268,14 @@ public partial class sharedCalendarDetails : System.Web.UI.Page
             txtEventDate.Text = Convert.ToDateTime(row["EventDate"]).ToString("yyyy-MM-dd");
             txtEventTime.Text = row["EventTime"]?.ToString() ?? "";
             txtEventNotes.Text = row["Notes"]?.ToString() ?? "";
+            if (row["Category"] != DBNull.Value && row["Category"] != null)
+            {
+                string category = row["Category"].ToString();
+                if (ddlEventCategory.Items.FindByValue(category) != null)
+                {
+                    ddlEventCategory.SelectedValue = category;
+                }
+            }
             ViewState["EditingEventId"] = eventId;
             pnlAddEvent.Visible = true;
             btnAddEvent.Visible = false;
@@ -331,6 +340,7 @@ public partial class sharedCalendarDetails : System.Web.UI.Page
         txtEventDate.Text = "";
         txtEventTime.Text = "";
         txtEventNotes.Text = "";
+        ddlEventCategory.SelectedIndex = 0;
     }
 }
 

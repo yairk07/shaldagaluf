@@ -76,9 +76,16 @@
 
                     <div class="form-group">
                         <label class="form-label">עיר <span class="required">*</span></label>
-                        <asp:DropDownList ID="ddlOptions" runat="server" CssClass="form-input">
-                            <asp:ListItem Text="בחר עיר" Value="" />
-                        </asp:DropDownList>
+                        <div class="searchable-dropdown-wrapper">
+                            <div class="searchable-dropdown-container">
+                                <input type="text" id="citySearchInput" class="form-input searchable-dropdown-input" placeholder="חפש ובחר עיר..." autocomplete="off" onkeyup="filterDropdownCities()" onfocus="showDropdown()" />
+                                <button type="button" class="btn-clear-city" onclick="clearCitySelection()">נקה</button>
+                            </div>
+                            <asp:DropDownList ID="ddlOptions" runat="server" CssClass="form-input city-dropdown" style="display:none;">
+                                <asp:ListItem Text="בחר עיר" Value="" />
+                            </asp:DropDownList>
+                            <div id="cityDropdownList" class="city-dropdown-list"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -192,6 +199,85 @@
             padding-left: 40px;
         }
 
+        .searchable-dropdown-wrapper {
+            position: relative;
+        }
+
+        .searchable-dropdown-container {
+            display: flex;
+            gap: 8px;
+        }
+
+        .searchable-dropdown-input {
+            flex: 1;
+        }
+
+        .btn-clear-city {
+            padding: 12px 20px;
+            background: var(--border);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background .2s ease, border-color .2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-clear-city:hover {
+            background: var(--brand);
+            border-color: var(--brand);
+            color: #fff;
+        }
+
+        .city-dropdown {
+            width: 100%;
+        }
+
+        .city-dropdown-list {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 4px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
+        }
+
+        .city-dropdown-list.show {
+            display: block;
+        }
+
+        .city-dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: background .2s ease;
+            direction: rtl;
+            text-align: right;
+        }
+
+        .city-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .city-dropdown-item:hover {
+            background: var(--brand);
+            color: #fff;
+        }
+
+        .city-dropdown-item.selected {
+            background: var(--brand);
+            color: #fff;
+        }
+
         .radio-button-wrapper {
             padding: 12px 0;
         }
@@ -303,4 +389,132 @@
             }
         }
     </style>
+
+    <script type="text/javascript">
+        var allCities = [];
+        var selectedCityId = '';
+        var selectedCityName = '';
+
+        function loadAllCities() {
+            var dropdown = document.getElementById('<%= ddlOptions.ClientID %>');
+            allCities = [];
+            
+            for (var i = 0; i < dropdown.options.length; i++) {
+                if (dropdown.options[i].value !== '') {
+                    allCities.push({
+                        id: dropdown.options[i].value,
+                        name: dropdown.options[i].text
+                    });
+                }
+            }
+        }
+
+        function filterDropdownCities() {
+            var searchText = document.getElementById('citySearchInput').value.toLowerCase();
+            var dropdownList = document.getElementById('cityDropdownList');
+            var hiddenDropdown = document.getElementById('<%= ddlOptions.ClientID %>');
+            
+            if (!allCities || allCities.length === 0) {
+                loadAllCities();
+            }
+
+            dropdownList.innerHTML = '';
+
+            if (searchText === '') {
+                showAllCities();
+                return;
+            }
+
+            var filteredCities = [];
+            for (var i = 0; i < allCities.length; i++) {
+                var cityName = allCities[i].name.toLowerCase();
+                if (cityName.indexOf(searchText) !== -1) {
+                    filteredCities.push(allCities[i]);
+                }
+            }
+
+            if (filteredCities.length === 0) {
+                var noResult = document.createElement('div');
+                noResult.className = 'city-dropdown-item';
+                noResult.textContent = 'לא נמצאו תוצאות';
+                noResult.style.cursor = 'default';
+                dropdownList.appendChild(noResult);
+            } else {
+                for (var j = 0; j < filteredCities.length; j++) {
+                    var item = document.createElement('div');
+                    item.className = 'city-dropdown-item';
+                    item.textContent = filteredCities[j].name;
+                    item.onclick = function(city) {
+                        return function() {
+                            selectCity(city.id, city.name);
+                        };
+                    }(filteredCities[j]);
+                    dropdownList.appendChild(item);
+                }
+            }
+
+            showDropdown();
+        }
+
+        function showAllCities() {
+            var dropdownList = document.getElementById('cityDropdownList');
+            dropdownList.innerHTML = '';
+
+            for (var i = 0; i < allCities.length; i++) {
+                var item = document.createElement('div');
+                item.className = 'city-dropdown-item';
+                item.textContent = allCities[i].name;
+                item.onclick = function(city) {
+                    return function() {
+                        selectCity(city.id, city.name);
+                    };
+                }(allCities[i]);
+                dropdownList.appendChild(item);
+            }
+        }
+
+        function showDropdown() {
+            var dropdownList = document.getElementById('cityDropdownList');
+            if (dropdownList.innerHTML === '') {
+                showAllCities();
+            }
+            dropdownList.classList.add('show');
+        }
+
+        function hideDropdown() {
+            var dropdownList = document.getElementById('cityDropdownList');
+            dropdownList.classList.remove('show');
+        }
+
+        function selectCity(cityId, cityName) {
+            selectedCityId = cityId;
+            selectedCityName = cityName;
+            
+            document.getElementById('citySearchInput').value = cityName;
+            var hiddenDropdown = document.getElementById('<%= ddlOptions.ClientID %>');
+            hiddenDropdown.value = cityId;
+            
+            hideDropdown();
+        }
+
+        function clearCitySelection() {
+            selectedCityId = '';
+            selectedCityName = '';
+            document.getElementById('citySearchInput').value = '';
+            var hiddenDropdown = document.getElementById('<%= ddlOptions.ClientID %>');
+            hiddenDropdown.selectedIndex = 0;
+            hideDropdown();
+        }
+
+        document.addEventListener('click', function(event) {
+            var wrapper = document.querySelector('.searchable-dropdown-wrapper');
+            if (wrapper && !wrapper.contains(event.target)) {
+                hideDropdown();
+            }
+        });
+
+        window.onload = function() {
+            loadAllCities();
+        };
+    </script>
 </asp:Content>

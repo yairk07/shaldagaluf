@@ -4,9 +4,9 @@ using System.Data.OleDb;
 
 public class calnderservice
 {
-    public void InsertEvent(string title, DateTime date, string time, string notes, int? userId = null)
+    public void InsertEvent(string title, DateTime date, string time, string notes, string category, int? userId = null)
     {
-        string sql = "INSERT INTO calnder ([title], [date], [time], [notes], [Userid]) VALUES (?, ?, ?, ?, ?)";
+        string sql = "INSERT INTO calnder ([title], [date], [time], [notes], [category], [Userid]) VALUES (?, ?, ?, ?, ?, ?)";
 
         using (OleDbConnection conn = new OleDbConnection(Connect.GetConnectionString()))
         using (OleDbCommand cmd = new OleDbCommand(sql, conn))
@@ -15,6 +15,7 @@ public class calnderservice
             cmd.Parameters.AddWithValue("?", date);
             cmd.Parameters.AddWithValue("?", time);
             cmd.Parameters.AddWithValue("?", notes);
+            cmd.Parameters.AddWithValue("?", category ?? "אחר");
             cmd.Parameters.AddWithValue("?", userId.HasValue ? (object)userId.Value : DBNull.Value);
 
             conn.Open();
@@ -63,7 +64,8 @@ SELECT
     SCE.Title AS title,
     SCE.[Date] AS [date],
     SCE.[Time] AS [time],
-    SCE.Notes AS notes
+    SCE.Notes AS notes,
+    SCE.Category AS category
 FROM SharedCalendarEvents SCE
 INNER JOIN SharedCalendarMembers SCM ON SCE.CalendarId = SCM.CalendarId
 WHERE SCM.UserId = ?";

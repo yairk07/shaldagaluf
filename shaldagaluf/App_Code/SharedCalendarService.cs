@@ -68,6 +68,7 @@ CREATE TABLE SharedCalendarEvents (
     [Date] DATETIME,
     [Time] TEXT(50),
     Notes MEMO,
+    Category TEXT(50),
     CreatedBy LONG,
     CreatedDate DATETIME
 )";
@@ -452,6 +453,7 @@ SELECT
     SCE.[Date] AS EventDate,
     SCE.[Time] AS EventTime,
     SCE.Notes,
+    SCE.Category,
     SCE.CreatedBy,
     U.username AS CreatedByName,
     SCE.CreatedDate
@@ -486,7 +488,7 @@ WHERE SCE.CalendarId = ?";
         return dt;
     }
 
-    public void AddSharedCalendarEvent(int calendarId, string title, DateTime date, string time, string notes, int createdBy)
+    public void AddSharedCalendarEvent(int calendarId, string title, DateTime date, string time, string notes, string category, int createdBy)
     {
         string conStr = Connect.GetConnectionString();
 
@@ -496,7 +498,7 @@ WHERE SCE.CalendarId = ?";
             {
                 con.Open();
 
-                string sql = "INSERT INTO SharedCalendarEvents (CalendarId, Title, [Date], [Time], Notes, CreatedBy, CreatedDate) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                string sql = "INSERT INTO SharedCalendarEvents (CalendarId, Title, [Date], [Time], Notes, Category, CreatedBy, CreatedDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                 OleDbCommand cmd = new OleDbCommand(sql, con);
                 OleDbParameter calendarIdParam = new OleDbParameter("?", OleDbType.BigInt);
                 calendarIdParam.Value = (long)calendarId;
@@ -507,6 +509,7 @@ WHERE SCE.CalendarId = ?";
                 cmd.Parameters.Add(dateParam);
                 cmd.Parameters.AddWithValue("?", time ?? "");
                 cmd.Parameters.AddWithValue("?", notes ?? "");
+                cmd.Parameters.AddWithValue("?", category ?? "אחר");
                 OleDbParameter createdByParam = new OleDbParameter("?", OleDbType.BigInt);
                 createdByParam.Value = (long)createdBy;
                 cmd.Parameters.Add(createdByParam);
@@ -524,7 +527,7 @@ WHERE SCE.CalendarId = ?";
         }
     }
 
-    public void UpdateSharedCalendarEvent(int eventId, string title, DateTime date, string time, string notes)
+    public void UpdateSharedCalendarEvent(int eventId, string title, DateTime date, string time, string notes, string category)
     {
         string conStr = Connect.GetConnectionString();
 
@@ -534,7 +537,7 @@ WHERE SCE.CalendarId = ?";
             {
                 con.Open();
 
-                string sql = "UPDATE SharedCalendarEvents SET Title = ?, [Date] = ?, [Time] = ?, Notes = ? WHERE Id = ?";
+                string sql = "UPDATE SharedCalendarEvents SET Title = ?, [Date] = ?, [Time] = ?, Notes = ?, Category = ? WHERE Id = ?";
                 OleDbCommand cmd = new OleDbCommand(sql, con);
                 cmd.Parameters.AddWithValue("?", title ?? "");
                 OleDbParameter dateParam = new OleDbParameter("?", OleDbType.Date);
@@ -542,6 +545,7 @@ WHERE SCE.CalendarId = ?";
                 cmd.Parameters.Add(dateParam);
                 cmd.Parameters.AddWithValue("?", time ?? "");
                 cmd.Parameters.AddWithValue("?", notes ?? "");
+                cmd.Parameters.AddWithValue("?", category ?? "אחר");
                 OleDbParameter eventIdParam = new OleDbParameter("?", OleDbType.BigInt);
                 eventIdParam.Value = (long)eventId;
                 cmd.Parameters.Add(eventIdParam);
